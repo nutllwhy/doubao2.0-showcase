@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>贪吃蛇豪华版 - Snake Deluxe</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🐍 贪吃蛇豪华版</h1>
+            <div class="score-board">
+                <span class="score-label">分数：</span>
+                <span id="score" class="score">0</span>
+                <span class="high-score-label">最高分：</span>
+                <span id="highScore" class="high-score">0</span>
+            </div>
+        </header>
+
+        <div class="game-wrapper">
+            <canvas id="gameCanvas" width="500" height="500"></canvas>
+            
+            <div id="startScreen" class="overlay">
+                <h2>选择难度</h2>
+                <div class="difficulty-buttons">
+                    <button class="difficulty-btn easy" data-difficulty="easy">😊 简单</button>
+                    <button class="difficulty-btn normal" data-difficulty="normal">😐 普通</button>
+                    <button class="difficulty-btn hard" data-difficulty="hard">😈 困难</button>
+                </div>
+                <button id="leaderboardBtn" class="secondary-btn">🏆 排行榜</button>
+            </div>
+
+            <div id="gameOverScreen" class="overlay hidden">
+                <h2>游戏结束！</h2>
+                <p class="final-score">最终分数：<span id="finalScore">0</span></p>
+                <div class="name-input">
+                    <input type="text" id="playerName" placeholder="输入你的名字" maxlength="10">
+                </div>
+                <div class="game-over-buttons">
+                    <button id="saveScoreBtn" class="primary-btn">保存分数</button>
+                    <button id="restartBtn" class="primary-btn">再来一局</button>
+                </div>
+            </div>
+
+            <div id="leaderboardScreen" class="overlay hidden">
+                <h2>🏆 排行榜</h2>
+                <div id="leaderboardList" class="leaderboard-list"></div>
+                <button id="closeLeaderboardBtn" class="secondary-btn">返回</button>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="powerup-status" id="powerupStatus"></div>
+            <div class="instructions">
+                <p>🎮 方向键 / WASD 控制移动</p>
+                <p>⏸️ 空格键 暂停游戏</p>
+            </div>
+        </div>
+
+        <div class="back-link">
+            <a href="../../index.html">← 返回主页</a>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
