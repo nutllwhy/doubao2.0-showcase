@@ -1,6 +1,6 @@
-# Web Demo Showcase
+# Doubao 2.0 Showcase
 
-一个展示四个网页项目的展示平台，包含两个小游戏和两个小工具。
+豆包2.0编程能力测试：展示四个网页项目的展示平台，包含两个小游戏和两个小工具。
 
 ## 项目列表
 
@@ -23,12 +23,12 @@
 
 直接用浏览器打开 `index.html` 即可！
 
-或者访问 GitHub Pages：[https://nutllwhy.github.io/web-demo-showcase/](https://nutllwhy.github.io/web-demo-showcase/)
+或者访问 GitHub Pages：[https://nutllwhy.github.io/doubao2.0-showcase/](https://nutllwhy.github.io/doubao2.0-showcase/)
 
 ## 项目结构
 
 ```
-web-demo-showcase/
+doubao2.0-showcase/
 ├── index.html          # 主页
 ├── README.md          # 说明文档
 ├── games/
