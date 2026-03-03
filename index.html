@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Demo Showcase - 网页项目展示</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 60px;
+        }
+
+        header h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .section-title {
+            color: white;
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            text-align: center;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .card-icon {
+            font-size: 4rem;
+            text-align: center;
+            padding: 40px 20px 20px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .card.game .card-icon {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .card.tool .card-icon {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .card-content {
+            padding: 25px;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .card-desc {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag {
+            background: #f0f0f0;
+            color: #666;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            opacity: 0.8;
+            margin-top: 60px;
+        }
+
+        footer a {
+            color: white;
+            text-decoration: underline;
+        }
+
+        .coming-soon {
+            display: inline-block;
+            background: #ffd700;
+            color: #333;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎮 Web Demo Showcase</h1>
+            <p>两个小游戏 · 两个小工具 · 纯前端实现</p>
+        </header>
+
+        <h2 class="section-title">🎮 小游戏</h2>
+        <div class="cards-grid">
+            <div class="card game" onclick="alert('开发中，敬请期待！')">
+                <div class="card-icon">🐍</div>
+                <div class="card-content">
+                    <h3 class="card-title">贪吃蛇豪华版 <span class="coming-soon">开发中</span></h3>
+                    <p class="card-desc">经典贪吃蛇，加入特效粒子系统、多样道具、分数系统和本地排行榜，三种难度模式任你挑战！</p>
+                    <div class="card-tags">
+                        <span class="tag">Canvas</span>
+                        <span class="tag">粒子特效</span>
+                        <span class="tag">排行榜</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card game" onclick="alert('开发中，敬请期待！')">
+                <div class="card-icon">🎯</div>
+                <div class="card-content">
+                    <h3 class="card-title">2048 AI对战版 <span class="coming-soon">开发中</span></h3>
+                    <p class="card-desc">经典2048，加入AI对战功能！你可以和AI比谁更快到2048，或者看AI自己玩出高分！</p>
+                    <div class="card-tags">
+                        <span class="tag">AI算法</span>
+                        <span class="tag">对战模式</span>
+                        <span class="tag">平滑动画</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="section-title">🛠️ 小工具</h2>
+        <div class="cards-grid">
+            <div class="card tool" onclick="alert('开发中，敬请期待！')">
+                <div class="card-icon">📝</div>
+                <div class="card-content">
+                    <h3 class="card-title">Markdown编辑器 <span class="coming-soon">开发中</span></h3>
+                    <p class="card-desc">分屏实时预览，完整Markdown语法支持，代码高亮，一键导出HTML/PDF！</p>
+                    <div class="card-tags">
+                        <span class="tag">分屏编辑</span>
+                        <span class="tag">语法高亮</span>
+                        <span class="tag">导出功能</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card tool" onclick="alert('开发中，敬请期待！')">
+                <div class="card-icon">🎨</div>
+                <div class="card-content">
+                    <h3 class="card-title">CSS渐变生成器 <span class="coming-soon">开发中</span></h3>
+                    <p class="card-desc">可视化渐变编辑器，支持线性/径向/重复渐变，多种预设方案，一键复制代码！</p>
+                    <div class="card-tags">
+                        <span class="tag">可视化</span>
+                        <span class="tag">预设方案</span>
+                        <span class="tag">一键复制</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>开源在 <a href="https://github.com/nutllwhy/web-demo-showcase" target="_blank">GitHub</a> · 用 ❤️ 制作</p>
+        </footer>
+    </div>
+</body>
+</html>
