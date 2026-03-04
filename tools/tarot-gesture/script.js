@@ -208,11 +208,6 @@ function onResults(results) {
     canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
 
     if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-        for (const landmarks of results.multiHandLandmarks) {
-            drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, { color: '#9d4edd', lineWidth: 3 });
-            drawLandmarks(canvasCtx, landmarks, { color: '#c77dff', lineWidth: 1, radius: 4 });
-        }
-
         const gesture = detectGesture(results.multiHandLandmarks[0]);
         handleGesture(gesture);
     } else {
