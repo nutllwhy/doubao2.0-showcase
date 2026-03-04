@@ -115,7 +115,7 @@ let lastGesture = null;
 let gestureHoldTime = 0;
 
 function init() {
-    showStatus('🔮', '正在加载摄像头...');
+    showStatus('📷', '请允许访问摄像头', true);
     
     videoElement = document.getElementById('video');
     canvasElement = document.getElementById('canvas');
@@ -134,7 +134,7 @@ function init() {
 
     hands.onResults(onResults);
 
-    startCamera();
+    requestCameraPermission();
     initCards();
     
     document.querySelectorAll('.spread-btn').forEach(btn => {
@@ -157,19 +157,38 @@ function init() {
     document.getElementById('resetBtn').addEventListener('click', resetGame);
 }
 
-function startCamera() {
-    const camera = new Camera(videoElement, {
-        onFrame: async () => {
-            await hands.send({ image: videoElement });
-        },
-        width: 640,
-        height: 480
-    });
-    camera.start().then(() => {
+async function requestCameraPermission() {
+    try {
+        showStatus('📷', '正在请求摄像头权限...');
+        
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+                width: 640,
+                height: 480,
+                facingMode: 'user'
+            }
+        });
+        
+        videoElement.srcObject = stream;
+        await videoElement.play();
+        
+        showStatus('🔮', '正在加载手势识别...');
+        
+        const camera = new Camera(videoElement, {
+            onFrame: async () => {
+                await hands.send({ image: videoElement });
+            },
+            width: 640,
+            height: 480
+        });
+        
+        await camera.start();
         hideStatus();
-    }).catch(err => {
-        showStatus('⚠️', '无法访问摄像头，请确保已授权');
-    });
+        
+    } catch (err) {
+        console.error('Camera error:', err);
+        showStatus('⚠️', '无法访问摄像头，请检查权限设置后刷新页面', true);
+    }
 }
 
 function onResults(results) {
@@ -369,9 +388,38 @@ function resetGame() {
     gestureHoldTime = 0;
 }
 
-function showStatus(icon, text) {
+function showStatus(icon, text, showRefresh = false) {
     document.getElementById('statusIcon').textContent = icon;
     document.getElementById('statusText').textContent = text;
+    
+    let refreshBtn = document.getElementById('refreshBtn');
+    if (showRefresh) {
+        if (!refreshBtn) {
+            refreshBtn = document.createElement('button');
+            refreshBtn.id = 'refreshBtn';
+            refreshBtn.style.cssText = `
+                margin-top: 20px;
+                padding: 12px 25px;
+                background: linear-gradient(135deg, #9d4edd 0%, #7b2cbf 100%);
+                border: none;
+                border-radius: 8px;
+                color: white;
+                font-size: 1rem;
+                cursor: pointer;
+                font-family: Georgia, serif;
+                transition: all 0.3s ease;
+            `;
+            refreshBtn.textContent = '🔄 刷新页面';
+            refreshBtn.onclick = () => location.reload();
+            document.getElementById('statusOverlay').appendChild(refreshBtn);
+        }
+        refreshBtn.style.display = 'block';
+    } else {
+        if (refreshBtn) {
+            refreshBtn.style.display = 'none';
+        }
+    }
+    
     document.getElementById('statusOverlay').classList.remove('hidden');
 }
 
