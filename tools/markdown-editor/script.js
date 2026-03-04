@@ -1,47 +1,44 @@
-// Markdown实时预览编辑器
-const STORAGE_KEY = 'markdown-editor-content';
-const THEME_KEY = 'markdown-editor-theme';
+// 公众号排版器
+const STORAGE_KEY = 'wechat-editor-content';
+const THEME_KEY = 'wechat-editor-template';
 
 let editor = null;
 let preview = null;
-let saveTimeout = null;
-let isDarkTheme = false;
+let currentTemplate = 'tech';
 
-const exampleTemplate = `# Markdown 示例文档
+const exampleTemplate = `# 公众号文章标题
 
-欢迎使用 Markdown 实时预览编辑器！
+这是一段公众号文章的开头内容，可以用来吸引读者的注意力。
 
-## 基础语法
+## 二级标题
 
-### 文本样式
+这里是二级标题的内容，你可以在这里详细阐述你的观点。
+
+### 三级标题
+
+更细分的内容可以使用三级标题。
+
+## 列表示例
+
+### 无序列表
+
+- 这是第一个列表项
+- 这是第二个列表项
+- 这是第三个列表项
+
+### 有序列表
+
+1. 第一步
+2. 第二步
+3. 第三步
+
+## 引用和强调
+
+> 这是一段引用文字，可以用来强调重要的观点或者引用他人的话语。
 
 **粗体文字**，*斜体文字*，~~删除线~~
 
-### 列表
-
-无序列表：
-- 项目一
-- 项目二
-- 项目三
-
-有序列表：
-1. 第一项
-2. 第二项
-3. 第三项
-
-### 链接和图片
-
-[访问 GitHub](https://github.com)
-
-![Markdown Logo](https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Markdown-mark.svg/208px-Markdown-mark.svg.png)
-
-### 引用
-
-> 这是一段引用文字
-> 
-> 可以有多行
-
-### 代码
+## 代码展示
 
 行内代码：\`console.log('Hello World')\`
 
@@ -53,32 +50,23 @@ function greet(name) {
     return \`Hello, \${name}!\`;
 }
 
-console.log(greet('World'));
+console.log(greet('公众号'));
 \`\`\`
 
-\`\`\`python
-# Python 示例
-def greet(name):
-    return f"Hello, {name}!"
+## 表格
 
-print(greet("World"))
-\`\`\`
-
-### 表格
-
-| 姓名 | 年龄 | 职业 |
+| 功能 | 描述 | 状态 |
 |------|------|------|
-| 张三 | 25 | 工程师 |
-| 李四 | 30 | 设计师 |
-| 王五 | 28 | 产品经理 |
-
-### 分隔线
+| Markdown编辑 | 左侧编辑区域 | ✅ 完成 |
+| 公众号预览 | 右侧实时预览 | ✅ 完成 |
+| 样式模板 | 多种排版风格 | ✅ 完成 |
+| 一键复制 | 复制到公众号 | ✅ 完成 |
 
 ---
 
-## 开始编辑
+## 总结
 
-在左侧编辑器中修改内容，右侧会实时预览！
+这就是公众号排版器的使用示例！选择不同的样式模板，编辑你的内容，然后点击"复制到公众号"按钮，就可以直接粘贴到微信公众号后台了！
 `;
 
 function init() {
@@ -97,7 +85,6 @@ function init() {
     });
 
     loadContent();
-    loadTheme();
     bindEvents();
     updatePreview();
 }
@@ -108,48 +95,55 @@ function bindEvents() {
         scheduleSave();
     });
 
-    editor.addEventListener('keydown', handleShortcuts);
+    document.querySelectorAll('.template-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            setTemplate(btn.dataset.template);
+        });
+    });
+
+    document.querySelectorAll('.toolbar-btn').forEach(btn => {
+        if (btn.dataset.insert) {
+            btn.addEventListener('click', () => insertText(btn.dataset.insert));
+        }
+    });
 
     document.getElementById('loadTemplateBtn').addEventListener('click', loadTemplate);
     document.getElementById('clearBtn').addEventListener('click', clearEditor);
-    document.getElementById('exportHtmlBtn').addEventListener('click', exportHtml);
-    document.getElementById('exportPdfBtn').addEventListener('click', exportPdf);
-    document.getElementById('toggleThemeBtn').addEventListener('click', toggleTheme);
+    document.getElementById('copyWechatBtn').addEventListener('click', copyToWechat);
 }
 
-function handleShortcuts(e) {
-    if (e.ctrlKey || e.metaKey) {
-        switch (e.key.toLowerCase()) {
-            case 's':
-                e.preventDefault();
-                saveContent();
-                showNotification('已保存！');
-                break;
-            case 'b':
-                e.preventDefault();
-                wrapText('**', '**');
-                break;
-            case 'i':
-                e.preventDefault();
-                wrapText('*', '*');
-                break;
-            case 'k':
-                e.preventDefault();
-                wrapText('[', '](url)');
-                break;
+function setTemplate(template) {
+    currentTemplate = template;
+    
+    document.querySelectorAll('.template-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.template === template) {
+            btn.classList.add('active');
         }
-    }
+    });
+    
+    preview.className = 'wechat-preview template-' + template;
+    updatePreview();
+    
+    localStorage.setItem(THEME_KEY, template);
 }
 
-function wrapText(prefix, suffix) {
+function insertText(type) {
+    const insertMap = {
+        'h2': '## 二级标题\n\n',
+        'h3': '### 三级标题\n\n',
+        'quote': '> 引用文字\n\n',
+        'code': '```\n代码内容\n```\n\n',
+        'list': '- 列表项\n'
+    };
+    
+    const text = insertMap[type] || '';
     const start = editor.selectionStart;
     const end = editor.selectionEnd;
-    const selectedText = editor.value.substring(start, end);
-    const newText = prefix + (selectedText || '文字') + suffix;
     
-    editor.value = editor.value.substring(0, start) + newText + editor.value.substring(end);
+    editor.value = editor.value.substring(0, start) + text + editor.value.substring(end);
     editor.focus();
-    editor.setSelectionRange(start + prefix.length, start + newText.length);
+    editor.setSelectionRange(start + text.length, start + text.length);
     
     updatePreview();
     scheduleSave();
@@ -157,36 +151,13 @@ function wrapText(prefix, suffix) {
 
 function updatePreview() {
     const content = editor.value;
-    preview.innerHTML = marked.parse(content);
-    preview.querySelectorAll('pre code').forEach((block) => {
+    const html = marked.parse(content);
+    
+    preview.innerHTML = '<div class="wechat-content">' + html + '</div>';
+    
+    preview.querySelectorAll('pre code').forEach(block => {
         Prism.highlightElement(block);
     });
-}
-
-function scheduleSave() {
-    const saveStatus = document.getElementById('saveStatus');
-    saveStatus.textContent = '保存中...';
-    saveStatus.classList.add('saving');
-
-    if (saveTimeout) clearTimeout(saveTimeout);
-    saveTimeout = setTimeout(() => {
-        saveContent();
-        saveStatus.textContent = '已保存';
-        saveStatus.classList.remove('saving');
-    }, 500);
-}
-
-function saveContent() {
-    localStorage.setItem(STORAGE_KEY, editor.value);
-}
-
-function loadContent() {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-        editor.value = saved;
-    } else {
-        editor.value = exampleTemplate;
-    }
 }
 
 function loadTemplate() {
@@ -196,7 +167,7 @@ function loadTemplate() {
     editor.value = exampleTemplate;
     updatePreview();
     scheduleSave();
-    showNotification('示例模板已加载！');
+    showCopyStatus('示例模板已加载！');
 }
 
 function clearEditor() {
@@ -206,115 +177,91 @@ function clearEditor() {
     editor.value = '';
     updatePreview();
     scheduleSave();
-    showNotification('编辑器已清空！');
+    showCopyStatus('编辑器已清空！');
 }
 
-function exportHtml() {
-    const htmlContent = `<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>导出的文档</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 40px 20px;
-            line-height: 1.8;
-        }
-        h1, h2, h3 { border-bottom: 1px solid #eee; padding-bottom: 0.3em; }
-        code { background: #f4f4f4; padding: 0.2em 0.4em; border-radius: 3px; }
-        pre { background: #2d2d2d; color: #ccc; padding: 1em; border-radius: 5px; overflow-x: auto; }
-        blockquote { border-left: 4px solid #667eea; padding-left: 1em; color: #666; }
-        table { border-collapse: collapse; width: 100%; }
-        th, td { border: 1px solid #ddd; padding: 8px 12px; }
-        th { background: #f4f4f4; }
-        img { max-width: 100%; }
-    </style>
-</head>
-<body>
-${preview.innerHTML}
-</body>
-</html>`;
+function copyToWechat() {
+    const contentDiv = preview.querySelector('.wechat-content');
+    if (!contentDiv) {
+        showCopyStatus('没有内容可复制！');
+        return;
+    }
 
-    downloadFile(htmlContent, 'document.html', 'text/html');
-    showNotification('HTML已导出！');
-}
-
-async function exportPdf() {
-    showNotification('正在生成PDF，请稍候...');
+    const tempDiv = contentDiv.cloneNode(true);
     
+    tempDiv.querySelectorAll('pre code').forEach(code => {
+        const pre = code.parentElement;
+        const newPre = document.createElement('pre');
+        newPre.style.cssText = window.getComputedStyle(pre).cssText;
+        newPre.textContent = code.textContent;
+        pre.parentNode.replaceChild(newPre, pre);
+    });
+
+    const style = getComputedStyle(preview);
+    const bgColor = style.getPropertyValue('--wechat-bg') || '#ffffff';
+    const textColor = style.getPropertyValue('--wechat-text') || '#333333';
+    const primaryColor = style.getPropertyValue('--wechat-primary') || '#1890ff';
+
+    tempDiv.style.backgroundColor = bgColor;
+    tempDiv.style.color = textColor;
+    tempDiv.querySelectorAll('h1, h2, h3, strong, b, a').forEach(el => {
+        el.style.color = primaryColor;
+    });
+
+    const range = document.createRange();
+    range.selectNode(tempDiv);
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+
     try {
-        const { jsPDF } = window.jspdf;
-        const canvas = await html2canvas(preview, {
-            scale: 2,
-            useCORS: true,
-            backgroundColor: '#ffffff'
-        });
-        
-        const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF({
-            orientation: canvas.width > canvas.height ? 'landscape' : 'portrait',
-            unit: 'mm',
-            format: 'a4'
-        });
-        
-        const imgWidth = pdf.internal.pageSize.getWidth();
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        
-        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-        pdf.save('document.pdf');
-        showNotification('PDF已导出！');
-    } catch (error) {
-        console.error('PDF导出失败:', error);
-        showNotification('PDF导出失败，尝试使用浏览器打印功能');
-        window.print();
+        document.execCommand('copy');
+        showCopyStatus('✓ 已复制到剪贴板！请到公众号后台粘贴');
+    } catch (err) {
+        showCopyStatus('复制失败，请手动选择复制');
     }
+
+    selection.removeAllRanges();
 }
 
-function downloadFile(content, filename, type) {
-    const blob = new Blob([content], { type });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-}
-
-function loadTheme() {
-    const savedTheme = localStorage.getItem(THEME_KEY);
-    if (savedTheme === 'dark') {
-        isDarkTheme = true;
-        document.body.classList.add('dark');
-        updateThemeButton();
-    }
-}
-
-function toggleTheme() {
-    isDarkTheme = !isDarkTheme;
-    document.body.classList.toggle('dark');
-    localStorage.setItem(THEME_KEY, isDarkTheme ? 'dark' : 'light');
-    updateThemeButton();
-}
-
-function updateThemeButton() {
-    const btn = document.getElementById('toggleThemeBtn');
-    btn.textContent = isDarkTheme ? '☀️ 切换主题' : '🌙 切换主题';
-}
-
-function showNotification(message) {
-    const notification = document.getElementById('notification');
-    notification.textContent = message;
-    notification.classList.remove('hidden');
+function showCopyStatus(message) {
+    const status = document.getElementById('copyStatus');
+    status.textContent = message;
+    status.classList.remove('hidden');
     
     setTimeout(() => {
-        notification.classList.add('hidden');
+        status.classList.add('hidden');
     }, 2500);
 }
+
+function scheduleSave() {
+    clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(() => {
+        saveContent();
+    }, 1000);
+}
+
+function saveContent() {
+    localStorage.setItem(STORAGE_KEY, editor.value);
+}
+
+function loadContent() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    const savedTemplate = localStorage.getItem(THEME_KEY);
+    
+    if (saved) {
+        editor.value = saved;
+    } else {
+        editor.value = exampleTemplate;
+    }
+    
+    if (savedTemplate) {
+        setTemplate(savedTemplate);
+    } else {
+        setTemplate('tech');
+    }
+}
+
+let saveTimeout = null;
 
 init();
