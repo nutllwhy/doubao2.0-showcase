@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown实时预览编辑器</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/11.1.1/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-c.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📝 Markdown实时预览编辑器</h1>
+            <div class="toolbar">
+                <button id="loadTemplateBtn" class="toolbar-btn">📄 加载示例</button>
+                <button id="clearBtn" class="toolbar-btn">🗑️ 清空</button>
+                <button id="exportHtmlBtn" class="toolbar-btn">📤 导出HTML</button>
+                <button id="exportPdfBtn" class="toolbar-btn">📄 导出PDF</button>
+                <button id="toggleThemeBtn" class="toolbar-btn">🌙 切换主题</button>
+            </div>
+        </header>
+
+        <div class="editor-container">
+            <div class="editor-pane">
+                <div class="pane-header">
+                    <h2>✏️ 编辑器</h2>
+                    <span id="saveStatus" class="save-status">已保存</span>
+                </div>
+                <textarea id="editor" placeholder="在这里输入Markdown内容..."></textarea>
+            </div>
+
+            <div class="preview-pane">
+                <div class="pane-header">
+                    <h2>👁️ 预览</h2>
+                </div>
+                <div id="preview" class="preview"></div>
+            </div>
+        </div>
+
+        <div class="back-link">
+            <a href="../../index.html">← 返回主页</a>
+        </div>
+    </div>
+
+    <div id="notification" class="notification hidden"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
