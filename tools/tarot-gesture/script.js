@@ -173,21 +173,26 @@ async function requestCameraPermission() {
         
         showStatus('🔮', '正在加载手势识别...');
         
-        const camera = new Camera(videoElement, {
-            onFrame: async () => {
-                await hands.send({ image: videoElement });
-            },
-            width: 640,
-            height: 480
-        });
-        
-        await camera.start();
-        hideStatus();
+        setTimeout(() => {
+            hideStatus();
+            startGestureDetection();
+        }, 800);
         
     } catch (err) {
         console.error('Camera error:', err);
         showStatus('⚠️', '无法访问摄像头，请检查权限设置后刷新页面', true);
     }
+}
+
+async function startGestureDetection() {
+    async function onFrame() {
+        try {
+            await hands.send({ image: videoElement });
+        } catch (e) {
+        }
+        requestAnimationFrame(onFrame);
+    }
+    onFrame();
 }
 
 function onResults(results) {
