@@ -93,7 +93,7 @@ function playSound(type) {
 function init() {
     initAudio();
     scene = new THREE.Scene();
-    scene.fog = new THREE.Fog(0x0a0a0f, 10, 100);
+    scene.fog = new THREE.Fog(0x0a0a0f, 10, 200);
 
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.set(0, 5, 8);
@@ -286,15 +286,99 @@ function createBackground() {
 }
 
 function spawnObstacle() {
-    const obstacleGeometry = new THREE.BoxGeometry(1.5, 2, 1.5);
-    const obstacleMaterial = new THREE.MeshPhongMaterial({ 
-        color: 0xff0055,
-        emissive: 0xff0055,
-        emissiveIntensity: 0.5
-    });
-    const obstacle = new THREE.Mesh(obstacleGeometry, obstacleMaterial);
+    const types = ['barrier', 'cone', 'box', 'pillar'];
+    const type = types[Math.floor(Math.random() * types.length)];
+    
+    let obstacle;
+    switch(type) {
+        case 'barrier':
+            const barrierGroup = new THREE.Group();
+            const barrierBase = new THREE.Mesh(
+                new THREE.BoxGeometry(2.5, 0.3, 0.8),
+                new THREE.MeshPhongMaterial({ color: 0x333333, emissive: 0x222222 })
+            );
+            barrierBase.position.y = 0.15;
+            barrierGroup.add(barrierBase);
+            
+            for (let i = 0; i < 5; i++) {
+                const stripe = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.4, 0.8, 0.1),
+                    new THREE.MeshPhongMaterial({ 
+                        color: i % 2 === 0 ? 0xffff00 : 0x000000,
+                        emissive: i % 2 === 0 ? 0xffaa00 : 0x000000
+                    })
+                );
+                stripe.position.set(-1 + i * 0.5, 0.7, 0);
+                barrierGroup.add(stripe);
+            }
+            obstacle = barrierGroup;
+            obstacle.position.y = 0;
+            break;
+            
+        case 'cone':
+            const coneGroup = new THREE.Group();
+            const cone = new THREE.Mesh(
+                new THREE.ConeGeometry(0.6, 1.8, 16),
+                new THREE.MeshPhongMaterial({ color: 0xff6600, emissive: 0xff3300 })
+            );
+            cone.position.y = 0.9;
+            coneGroup.add(cone);
+            
+            for (let i = 0; i < 3; i++) {
+                const coneStripe = new THREE.Mesh(
+                    new THREE.TorusGeometry(0.2 + i * 0.15, 0.05, 8, 16),
+                    new THREE.MeshPhongMaterial({ color: 0xffffff, emissive: 0xaaaaaa })
+                );
+                coneStripe.position.y = 0.4 + i * 0.45;
+                coneStripe.rotation.x = Math.PI / 2;
+                coneGroup.add(coneStripe);
+            }
+            obstacle = coneGroup;
+            obstacle.position.y = 0;
+            break;
+            
+        case 'box':
+            const boxGroup = new THREE.Group();
+            const box = new THREE.Mesh(
+                new THREE.BoxGeometry(1.2, 1.2, 1.2),
+                new THREE.MeshPhongMaterial({ color: 0x8B4513, emissive: 0x5a2d0d })
+            );
+            box.position.y = 0.6;
+            boxGroup.add(box);
+            
+            const boxTop = new THREE.Mesh(
+                new THREE.BoxGeometry(1.3, 0.15, 1.3),
+                new THREE.MeshPhongMaterial({ color: 0x654321, emissive: 0x432d0d })
+            );
+            boxTop.position.y = 1.275;
+            boxGroup.add(boxTop);
+            
+            obstacle = boxGroup;
+            obstacle.position.y = 0;
+            break;
+            
+        case 'pillar':
+            const pillarGroup = new THREE.Group();
+            const pillar = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.4, 0.5, 2.5, 12),
+                new THREE.MeshPhongMaterial({ color: 0x444444, emissive: 0x222222 })
+            );
+            pillar.position.y = 1.25;
+            pillarGroup.add(pillar);
+            
+            const pillarLight = new THREE.Mesh(
+                new THREE.SphereGeometry(0.3, 12, 12),
+                new THREE.MeshPhongMaterial({ color: 0xff0000, emissive: 0xff0000, emissiveIntensity: 0.8 })
+            );
+            pillarLight.position.y = 2.6;
+            pillarGroup.add(pillarLight);
+            
+            obstacle = pillarGroup;
+            obstacle.position.y = 0;
+            break;
+    }
+    
     obstacle.position.x = lanes[Math.floor(Math.random() * 3)];
-    obstacle.position.y = 1;
     obstacle.position.z = -80 - Math.random() * 20;
     obstacle.userData.type = 'obstacle';
     scene.add(obstacle);
@@ -386,6 +470,7 @@ function checkCollisions() {
     for (let i = obstacles.length - 1; i >= 0; i--) {
         const obstacle = obstacles[i];
         const obstacleBox = new THREE.Box3().setFromObject(obstacle);
+        obstacleBox.expandByScalar(-0.3);
         
         if (playerBox.intersectsBox(obstacleBox)) {
             if (hasShield) {
@@ -619,7 +704,6 @@ function animate() {
 
         for (let i = obstacles.length - 1; i >= 0; i--) {
             obstacles[i].position.z += gameSpeed;
-            obstacles[i].rotation.y += 0.02;
             if (obstacles[i].position.z > 20) {
                 scene.remove(obstacles[i]);
                 obstacles.splice(i, 1);
