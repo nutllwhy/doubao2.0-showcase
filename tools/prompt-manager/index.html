@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI提示词管理器</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-top">
+                <div class="header-left">
+                    <a href="../../index.html" class="home-btn">🏠 主页</a>
+                </div>
+                <div class="header-center">
+                    <h1>🤖 AI提示词管理器</h1>
+                </div>
+                <div class="header-right">
+                </div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <h3>📂 分类</h3>
+                    <button id="addCategoryBtn" class="add-btn">+ 新建分类</button>
+                </div>
+                <div id="categoryList" class="category-list">
+                </div>
+            </div>
+
+            <div class="content">
+                <div class="content-header">
+                    <h2 id="currentCategoryTitle">📝 全部提示词</h2>
+                    <button id="addPromptBtn" class="add-btn">+ 新建提示词</button>
+                </div>
+                <div id="promptList" class="prompt-list">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="categoryModal" class="modal hidden">
+        <div class="modal-content">
+            <h2 id="categoryModalTitle">新建分类</h2>
+            <input type="text" id="categoryNameInput" placeholder="分类名称" class="input">
+            <input type="text" id="categoryIconInput" placeholder="图标（emoji）" class="input">
+            <div class="modal-buttons">
+                <button id="cancelCategoryBtn" class="secondary-btn">取消</button>
+                <button id="saveCategoryBtn" class="primary-btn">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="promptModal" class="modal hidden">
+        <div class="modal-content large">
+            <h2 id="promptModalTitle">新建提示词</h2>
+            <input type="text" id="promptTitleInput" placeholder="提示词标题" class="input">
+            <select id="promptCategorySelect" class="select">
+            </select>
+            <textarea id="promptContentInput" placeholder="提示词内容（支持Markdown）" class="textarea"></textarea>
+            <div class="modal-buttons">
+                <button id="cancelPromptBtn" class="secondary-btn">取消</button>
+                <button id="savePromptBtn" class="primary-btn">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="viewPromptModal" class="modal hidden">
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h2 id="viewPromptTitle"></h2>
+                <div class="modal-actions">
+                    <button id="editPromptBtn" class="secondary-btn">✏️ 编辑</button>
+                    <button id="copyPromptBtn" class="copy-btn">📋 复制</button>
+                </div>
+            </div>
+            <div id="viewPromptContent" class="prompt-view"></div>
+            <div class="modal-buttons">
+                <button id="closeViewBtn" class="secondary-btn">关闭</button>
+                <button id="deletePromptBtn" class="delete-btn">🗑️ 删除</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="copyStatus" class="copy-status hidden">✓ 已复制到剪贴板！</div>
+
+    <script src="script.js"></script>
+</body>
+</html>
