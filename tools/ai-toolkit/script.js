@@ -19,7 +19,7 @@ const providerPresets = {
     },
     doubao: {
         baseUrl: 'https://ark.cn-beijing.volces.com/api/v3',
-        model: 'ep-20241203xxxxxx'
+        model: 'doubao-pro-32k'
     },
     qwen: {
         baseUrl: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
@@ -304,24 +304,27 @@ async function generateContent(toolId) {
             copyToClipboard(result);
         };
     } catch (err) {
-        alert('生成失败：' + err.message);
+        console.error('API Error:', err);
+        alert('生成失败：\n\n' + err.message + '\n\n请检查：\n1. API Base URL是否正确\n2. API Key是否正确\n3. 模型名称是否正确');
     } finally {
         hideLoading();
     }
 }
 
 async function callAPI(prompt) {
-    const url = settings.baseUrl.endsWith('/') 
-        ? settings.baseUrl + 'chat/completions' 
-        : settings.baseUrl + '/chat/completions';
+    let url, headers, body;
     
-    const response = await fetch(url, {
-        method: 'POST',
-        headers: {
+    if (settings.provider === 'doubao') {
+        url = settings.baseUrl.endsWith('/') 
+            ? settings.baseUrl + 'chat/completions' 
+            : settings.baseUrl + '/chat/completions';
+        
+        headers = {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${settings.apiKey}`
-        },
-        body: JSON.stringify({
+        };
+        
+        body = JSON.stringify({
             model: settings.model,
             messages: [
                 {
@@ -334,7 +337,60 @@ async function callAPI(prompt) {
                 }
             ],
             temperature: 0.7
-        })
+        });
+    } else if (settings.provider === 'anthropic') {
+        url = settings.baseUrl.endsWith('/') 
+            ? settings.baseUrl + 'messages' 
+            : settings.baseUrl + '/messages';
+        
+        headers = {
+            'Content-Type': 'application/json',
+            'x-api-key': settings.apiKey,
+            'anthropic-version': '2023-06-01'
+        };
+        
+        body = JSON.stringify({
+            model: settings.model,
+            max_tokens: 4096,
+            system: '你是一个专业的AI内容助手，帮助博主创作优质内容。请用Markdown格式输出。',
+            messages: [
+                {
+                    role: 'user',
+                    content: prompt
+                }
+            ],
+            temperature: 0.7
+        });
+    } else {
+        url = settings.baseUrl.endsWith('/') 
+            ? settings.baseUrl + 'chat/completions' 
+            : settings.baseUrl + '/chat/completions';
+        
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${settings.apiKey}`
+        };
+        
+        body = JSON.stringify({
+            model: settings.model,
+            messages: [
+                {
+                    role: 'system',
+                    content: '你是一个专业的AI内容助手，帮助博主创作优质内容。请用Markdown格式输出。'
+                },
+                {
+                    role: 'user',
+                    content: prompt
+                }
+            ],
+            temperature: 0.7
+        });
+    }
+    
+    const response = await fetch(url, {
+        method: 'POST',
+        headers,
+        body
     });
     
     if (!response.ok) {
@@ -343,7 +399,12 @@ async function callAPI(prompt) {
     }
     
     const data = await response.json();
-    return data.choices[0].message.content;
+    
+    if (settings.provider === 'anthropic') {
+        return data.content[0].text;
+    } else {
+        return data.choices[0].message.content;
+    }
 }
 
 function showLoading(text) {
