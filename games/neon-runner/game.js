@@ -775,14 +775,13 @@ function animate() {
         if (isJumping) {
             player.position.y += jumpVelocity;
             jumpVelocity -= 0.015;
-            if (player.position.y <= 1.25) {
-                player.position.y = 1.25;
+            if (player.position.y <= 0.5) {
+                player.position.y = 0.5;
                 isJumping = false;
                 jumpVelocity = 0;
             }
         }
 
-        const targetX = lanes[playerLane];
         const tilt = (targetX - player.position.x) * 0.05;
         player.rotation.z = -tilt;
         
