@@ -13,7 +13,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
             padding: 40px 20px;
         }
@@ -25,27 +25,25 @@
 
         header {
             text-align: center;
-            color: white;
+            color: #2d3748;
             margin-bottom: 60px;
         }
 
         header h1 {
             font-size: 3rem;
             margin-bottom: 15px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
         }
 
         header p {
             font-size: 1.2rem;
-            opacity: 0.9;
+            color: #4a5568;
         }
 
         .section-title {
-            color: white;
+            color: #2d3748;
             font-size: 1.8rem;
             margin-bottom: 30px;
             text-align: center;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
         }
 
         .cards-grid {
@@ -73,15 +71,15 @@
             font-size: 4rem;
             text-align: center;
             padding: 40px 20px 20px;
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
         }
 
         .card.game .card-icon {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
         }
 
         .card.tool .card-icon {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            background: linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%);
         }
 
         .card-content {
@@ -150,7 +148,7 @@
     <div class="container">
         <header>
             <h1>🎮 Doubao 2.0 Showcase</h1>
-            <p>豆包2.0编程能力测试 · 三个小游戏 · 四个小工具 · 纯前端实现</p>
+            <p>豆包2.0编程能力测试 · 四个小游戏 · 三个小工具 · 纯前端实现</p>
         </header>
 
         <h2 class="section-title">🎮 小游戏</h2>
@@ -190,6 +188,19 @@
                         <span class="tag">Three.js</span>
                         <span class="tag">3D游戏</span>
                         <span class="tag">AI演示</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card game" onclick="window.location.href='tools/tarot-gesture/index.html'">
+                <div class="card-icon">🔮</div>
+                <div class="card-content">
+                    <h3 class="card-title">手势塔罗 ✅</h3>
+                    <p class="card-desc">用你的手势揭开命运的神秘面纱！MediaPipe手势识别，选牌解读爱情、事业、财运、健康运势！</p>
+                    <div class="card-tags">
+                        <span class="tag">手势识别</span>
+                        <span class="tag">MediaPipe</span>
+                        <span class="tag">运势解读</span>
                     </div>
                 </div>
             </div>
@@ -236,18 +247,6 @@
                 </div>
             </div>
 
-            <div class="card tool" onclick="window.location.href='tools/tarot-gesture/index.html'">
-                <div class="card-icon">🔮</div>
-                <div class="card-content">
-                    <h3 class="card-title">手势塔罗 ✅</h3>
-                    <p class="card-desc">用你的手势揭开命运的神秘面纱！MediaPipe手势识别，选牌解读爱情、事业、财运、健康运势！</p>
-                    <div class="card-tags">
-                        <span class="tag">手势识别</span>
-                        <span class="tag">MediaPipe</span>
-                        <span class="tag">运势解读</span>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <footer>
