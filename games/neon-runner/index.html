@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>霓虹冲刺 - 3D跑酷</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            background: #0a0a0f;
+        }
+
+        #gameCanvas {
+            display: block;
+        }
+
+        .ui-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+            pointer-events: auto;
+        }
+
+        .home-btn {
+            color: white;
+            text-decoration: none;
+            font-size: 1rem;
+            padding: 10px 20px;
+            border: 2px solid #00ffff;
+            background: rgba(0,255,255,0.1);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 10px #00ffff;
+        }
+
+        .home-btn:hover {
+            background: rgba(0,255,255,0.3);
+            box-shadow: 0 0 20px rgba(0,255,255,0.5);
+        }
+
+        .title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #00ffff;
+            text-shadow: 0 0 20px #00ffff, 0 0 40px #00ffff;
+        }
+
+        .score-panel {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .score-item {
+            text-align: center;
+        }
+
+        .score-label {
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .score-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ff00ff;
+            text-shadow: 0 0 15px #ff00ff;
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            pointer-events: auto;
+        }
+
+        .control-btn {
+            width: 60px;
+            height: 60px;
+            border: 2px solid #00ffff;
+            background: rgba(0,255,255,0.1);
+            border-radius: 50%;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-btn:hover {
+            background: rgba(0,255,255,0.3);
+            box-shadow: 0 0 20px rgba(0,255,255,0.5);
+        }
+
+        .control-btn:active {
+            transform: scale(0.95);
+        }
+
+        .game-over-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            pointer-events: auto;
+            z-index: 100;
+        }
+
+        .game-over-modal.hidden {
+            display: none;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 2px solid #00ffff;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(0,255,255,0.3);
+            max-width: 400px;
+        }
+
+        .modal-title {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ff00ff;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px #ff00ff;
+        }
+
+        .modal-score {
+            font-size: 1.2rem;
+            color: #00ffff;
+            margin-bottom: 30px;
+        }
+
+        .modal-score span {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ff00ff;
+            text-shadow: 0 0 15px #ff00ff;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn.primary {
+            background: linear-gradient(135deg, #00ffff 0%, #00cccc 100%);
+            color: #0a0a0f;
+        }
+
+        .modal-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0,255,255,0.5);
+        }
+
+        .modal-btn.secondary {
+            background: linear-gradient(135deg, #ff00ff 0%, #cc00cc 100%);
+            color: white;
+        }
+
+        .modal-btn.secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255,0,255,0.5);
+        }
+
+        .instructions {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #666;
+            font-size: 0.9rem;
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .instructions kbd {
+            background: rgba(255,255,255,0.1);
+            padding: 3px 8px;
+            border-radius: 4px;
+            border: 1px solid #444;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px 20px;
+            }
+
+            .title {
+                font-size: 1.2rem;
+            }
+
+            .score-panel {
+                gap: 15px;
+            }
+
+            .score-value {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+
+    <div class="ui-overlay">
+        <div class="header">
+            <a href="../../index.html" class="home-btn">🏠 主页</a>
+            <h1 class="title">🌃 霓虹冲刺</h1>
+            <div class="score-panel">
+                <div class="score-item">
+                    <div class="score-label">分数</div>
+                    <div class="score-value" id="scoreDisplay">0</div>
+                </div>
+                <div class="score-item">
+                    <div class="score-label">距离</div>
+                    <div class="score-value" id="distanceDisplay">0m</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <kbd>←</kbd> <kbd>→</kbd> 或 <kbd>A</kbd> <kbd>D</kbd> 左右移动 | <kbd>空格</kbd> 或 <kbd>↑</kbd> 或 <kbd>W</kbd> 跳跃
+        </div>
+
+        <div class="controls">
+            <button class="control-btn" id="leftBtn">←</button>
+            <button class="control-btn" id="jumpBtn">↑</button>
+            <button class="control-btn" id="rightBtn">→</button>
+        </div>
+    </div>
+
+    <div class="game-over-modal hidden" id="gameOverModal">
+        <div class="modal-content">
+            <h2 class="modal-title">💥 游戏结束</h2>
+            <p class="modal-score">最终分数：<span id="finalScore">0</span></p>
+            <div class="modal-buttons">
+                <button class="modal-btn secondary" id="aiDemoBtn">🤖 AI演示</button>
+                <button class="modal-btn primary" id="restartBtn">🔄 再来一次</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
