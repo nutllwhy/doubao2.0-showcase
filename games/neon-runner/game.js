@@ -7,7 +7,7 @@ let isGameOver = false, isAIDemo = false;
 let playerLane = 1;
 let isJumping = false, jumpVelocity = 0;
 let lanes = [-4, 0, 4];
-let lastObstacleZ = 0, lastCoinZ = 0, lastPowerupZ = 0;
+let lastObstacleDist = 0, lastCoinDist = 0, lastPowerupDist = 0;
 let playerLevel = 1;
 let hasShield = false, shieldMesh;
 let hasMagnet = false, magnetTime = 0;
@@ -295,11 +295,11 @@ function spawnObstacle() {
     const obstacle = new THREE.Mesh(obstacleGeometry, obstacleMaterial);
     obstacle.position.x = lanes[Math.floor(Math.random() * 3)];
     obstacle.position.y = 1;
-    obstacle.position.z = lastObstacleZ - 20 - Math.random() * 15;
+    obstacle.position.z = -80 - Math.random() * 20;
     obstacle.userData.type = 'obstacle';
     scene.add(obstacle);
     obstacles.push(obstacle);
-    lastObstacleZ = obstacle.position.z;
+    lastObstacleDist = distance;
 }
 
 function spawnCoin() {
@@ -312,11 +312,11 @@ function spawnCoin() {
     const coin = new THREE.Mesh(coinGeometry, coinMaterial);
     coin.position.x = lanes[Math.floor(Math.random() * 3)];
     coin.position.y = 2;
-    coin.position.z = lastCoinZ - 15 - Math.random() * 10;
+    coin.position.z = -70 - Math.random() * 20;
     coin.userData.type = 'coin';
     scene.add(coin);
     coins.push(coin);
-    lastCoinZ = coin.position.z;
+    lastCoinDist = distance;
 }
 
 function spawnPowerup() {
@@ -347,11 +347,11 @@ function spawnPowerup() {
     const powerup = new THREE.Mesh(geometry, material);
     powerup.position.x = lanes[Math.floor(Math.random() * 3)];
     powerup.position.y = 2.5;
-    powerup.position.z = lastPowerupZ - 50 - Math.random() * 30;
+    powerup.position.z = -90 - Math.random() * 30;
     powerup.userData.type = type;
     scene.add(powerup);
     powerups.push(powerup);
-    lastPowerupZ = powerup.position.z;
+    lastPowerupDist = distance;
 }
 
 function movePlayer(direction) {
@@ -498,9 +498,9 @@ function resetGame() {
     jumpVelocity = 0;
     isGameOver = false;
     isAIDemo = false;
-    lastObstacleZ = 0;
-    lastCoinZ = 0;
-    lastPowerupZ = 0;
+    lastObstacleDist = 0;
+    lastCoinDist = 0;
+    lastPowerupDist = 0;
     playerLevel = 1;
     hasShield = false;
     hasMagnet = false;
@@ -636,7 +636,7 @@ function animate() {
             }
         }
 
-        if (lastObstacleZ > -40) {
+        if (distance - lastObstacleDist > 20) {
             spawnObstacle();
             if (Math.random() > 0.6) {
                 const extraObstacleGeometry = new THREE.BoxGeometry(1.5, 2, 1.5);
@@ -652,16 +652,16 @@ function animate() {
                 }
                 extraObstacle.position.x = lanes[extraLane];
                 extraObstacle.position.y = 1;
-                extraObstacle.position.z = lastObstacleZ - 15 - Math.random() * 10;
+                extraObstacle.position.z = -90 - Math.random() * 20;
                 extraObstacle.userData.type = 'obstacle';
                 scene.add(extraObstacle);
                 obstacles.push(extraObstacle);
             }
         }
-        if (lastCoinZ > -30) {
+        if (distance - lastCoinDist > 15) {
             spawnCoin();
         }
-        if (lastPowerupZ > -100) {
+        if (distance - lastPowerupDist > 60) {
             spawnPowerup();
         }
         
