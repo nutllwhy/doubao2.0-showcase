@@ -132,6 +132,9 @@ class Game2048 {
     }
 
     move(direction, skipRender = false, skipSound = false) {
+        if (this.gridElement) {
+            console.log('move被调用，skipRender:', skipRender, 'skipSound:', skipSound);
+        }
         if (this.gameOver) return false;
 
         const oldGrid = JSON.stringify(this.grid);
@@ -455,6 +458,7 @@ function startAiVs() {
             const aiMove = getBestMove(aiGame);
             console.log('AI选择的方向:', aiMove);
             if (aiMove) {
+                console.log('AI调用move，skipSound=true');
                 aiGame.move(aiMove, false, true);
                 console.log('AI移动成功！AI分数:', aiGame.score);
             }
