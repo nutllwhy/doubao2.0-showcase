@@ -277,7 +277,7 @@ class Game2048 {
         const moves = [];
         for (const dir of ['up', 'down', 'left', 'right']) {
             const clone = this.clone();
-            if (clone.move(dir, true)) {
+            if (clone.move(dir, true, true)) {
                 moves.push({ direction: dir, game: clone });
             }
         }
