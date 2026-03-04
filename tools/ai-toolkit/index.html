@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI博主工具箱</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-top">
+                <div class="header-left">
+                    <a href="../../index.html" class="home-btn">🏠 主页</a>
+                </div>
+                <div class="header-center">
+                    <h1>🤖 AI博主工具箱</h1>
+                </div>
+                <div class="header-right">
+                    <button id="settingsBtn" class="settings-btn">⚙️ 设置</button>
+                </div>
+            </div>
+        </header>
+
+        <div id="welcomeBanner" class="welcome-banner hidden">
+            <div class="welcome-content">
+                <div class="welcome-icon">👋</div>
+                <h2>欢迎使用AI博主工具箱！</h2>
+                <p>先配置你的API Key，就能开始使用所有AI工具了</p>
+                <button id="welcomeConfigBtn" class="primary-btn large">立即配置</button>
+            </div>
+        </div>
+
+        <div class="tools-grid" id="toolsGrid">
+            <div class="tool-card" data-tool="video-script">
+                <div class="tool-icon">🎬</div>
+                <h3>视频脚本生成</h3>
+                <p>输入主题，自动生成完整视频脚本</p>
+            </div>
+
+            <div class="tool-card" data-tool="title-generator">
+                <div class="tool-icon">📝</div>
+                <h3>爆款标题生成</h3>
+                <p>生成10个吸引人的标题备选</p>
+            </div>
+
+            <div class="tool-card" data-tool="copy-polisher">
+                <div class="tool-icon">✨</div>
+                <h3>文案润色器</h3>
+                <p>优化文案，让它更适合公众号/短视频</p>
+            </div>
+
+            <div class="tool-card" data-tool="cover-prompt">
+                <div class="tool-icon">🎨</div>
+                <h3>封面提示词</h3>
+                <p>给Midjourney/Stable Diffusion写提示词</p>
+            </div>
+
+            <div class="tool-card" data-tool="outline-to-speech">
+                <div class="tool-icon">🎤</div>
+                <h3>大纲转演讲稿</h3>
+                <p>把文章大纲转成口播稿/直播稿</p>
+            </div>
+        </div>
+
+        <div id="toolPanel" class="tool-panel hidden">
+            <div class="panel-header">
+                <button id="backBtn" class="back-btn">← 返回</button>
+                <h2 id="panelTitle"></h2>
+                <div></div>
+            </div>
+            <div id="panelContent"></div>
+        </div>
+    </div>
+
+    <div id="settingsModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>⚙️ API设置</h2>
+                <button id="closeSettingsBtn" class="close-btn">✕</button>
+            </div>
+            <div class="settings-form">
+                <div class="form-group">
+                    <label>API提供商</label>
+                    <select id="providerSelect" class="select">
+                        <option value="openai">OpenAI (GPT-4, GPT-3.5)</option>
+                        <option value="anthropic">Anthropic (Claude)</option>
+                        <option value="doubao">豆包 (Doubao)</option>
+                        <option value="qwen">通义千问 (Qwen)</option>
+                        <option value="custom">自定义</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>API Base URL</label>
+                    <input type="text" id="baseUrlInput" placeholder="https://api.openai.com/v1" class="input">
+                </div>
+                <div class="form-group">
+                    <label>API Key</label>
+                    <input type="password" id="apiKeyInput" placeholder="sk-..." class="input">
+                </div>
+                <div class="form-group">
+                    <label>模型名称</label>
+                    <input type="text" id="modelInput" placeholder="gpt-4o, gpt-4-turbo, claude-3-opus..." class="input">
+                </div>
+                <div class="form-hint">
+                    <p>💡 你的API Key只保存在浏览器本地，不会上传到任何服务器</p>
+                </div>
+                <div class="modal-buttons">
+                    <button id="resetSettingsBtn" class="secondary-btn">重置</button>
+                    <button id="saveSettingsBtn" class="primary-btn">保存设置</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p id="loadingText">正在生成中...</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
