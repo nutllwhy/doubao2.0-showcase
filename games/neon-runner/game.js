@@ -178,63 +178,147 @@ function updatePlayerAppearance() {
         scene.remove(player);
     }
     
-    let geometry, color, emissiveColor, size;
+    let primaryColor, secondaryColor, glowSize;
     
     switch(playerLevel) {
         case 1:
-            geometry = new THREE.BoxGeometry(1, 1.5, 1);
-            color = 0xff00ff;
-            emissiveColor = 0xff00ff;
-            size = 1.5;
+            primaryColor = 0xff00ff;
+            secondaryColor = 0xaa00aa;
+            glowSize = 1.8;
             break;
         case 2:
-            geometry = new THREE.CapsuleGeometry(0.5, 1, 8, 16);
-            color = 0x00ffff;
-            emissiveColor = 0x00ffff;
-            size = 1.8;
+            primaryColor = 0x00ffff;
+            secondaryColor = 0x00aaaa;
+            glowSize = 2;
             break;
         case 3:
-            geometry = new THREE.DodecahedronGeometry(0.8);
-            color = 0xffff00;
-            emissiveColor = 0xffaa00;
-            size = 2;
+            primaryColor = 0xffff00;
+            secondaryColor = 0xaaaa00;
+            glowSize = 2.2;
             break;
         case 4:
-            geometry = new THREE.IcosahedronGeometry(0.8);
-            color = 0x00ff00;
-            emissiveColor = 0x00ff00;
-            size = 2.2;
+            primaryColor = 0x00ff00;
+            secondaryColor = 0x00aa00;
+            glowSize = 2.4;
             break;
         default:
-            geometry = new THREE.OctahedronGeometry(0.9);
-            color = 0xff6600;
-            emissiveColor = 0xff3300;
-            size = 2.5;
+            primaryColor = 0xff6600;
+            secondaryColor = 0xaa4400;
+            glowSize = 2.6;
     }
     
-    const bodyMaterial = new THREE.MeshPhongMaterial({ 
-        color: color,
-        emissive: emissiveColor,
-        emissiveIntensity: 0.5 + playerLevel * 0.1
-    });
-    player = new THREE.Mesh(geometry, bodyMaterial);
+    player = new THREE.Group();
     
-    const glowGeometry = new THREE.SphereGeometry(size, 16, 16);
+    const body = new THREE.Mesh(
+        new THREE.BoxGeometry(1.2, 0.5, 2),
+        new THREE.MeshPhongMaterial({ 
+            color: primaryColor,
+            emissive: primaryColor,
+            emissiveIntensity: 0.3 + playerLevel * 0.1
+        })
+    );
+    body.position.y = 0.5;
+    player.add(body);
+    
+    const cockpit = new THREE.Mesh(
+        new THREE.SphereGeometry(0.4, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2),
+        new THREE.MeshPhongMaterial({ 
+            color: 0x4444ff,
+            emissive: 0x2222aa,
+            transparent: true,
+            opacity: 0.8
+        })
+    );
+    cockpit.position.set(0, 0.9, -0.3);
+    player.add(cockpit);
+    
+    const leftWing = new THREE.Mesh(
+        new THREE.BoxGeometry(0.8, 0.15, 1.2),
+        new THREE.MeshPhongMaterial({ 
+            color: secondaryColor,
+            emissive: secondaryColor,
+            emissiveIntensity: 0.2
+        })
+    );
+    leftWing.position.set(-0.8, 0.45, 0.2);
+    player.add(leftWing);
+    
+    const rightWing = new THREE.Mesh(
+        new THREE.BoxGeometry(0.8, 0.15, 1.2),
+        new THREE.MeshPhongMaterial({ 
+            color: secondaryColor,
+            emissive: secondaryColor,
+            emissiveIntensity: 0.2
+        })
+    );
+    rightWing.position.set(0.8, 0.45, 0.2);
+    player.add(rightWing);
+    
+    const leftThruster = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.15, 0.25, 0.4, 12),
+        new THREE.MeshPhongMaterial({ 
+            color: 0x333333,
+            emissive: 0x111111
+        })
+    );
+    leftThruster.position.set(-0.4, 0.3, 0.9);
+    leftThruster.rotation.x = Math.PI / 2;
+    player.add(leftThruster);
+    
+    const rightThruster = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.15, 0.25, 0.4, 12),
+        new THREE.MeshPhongMaterial({ 
+            color: 0x333333,
+            emissive: 0x111111
+        })
+    );
+    rightThruster.position.set(0.4, 0.3, 0.9);
+    rightThruster.rotation.x = Math.PI / 2;
+    player.add(rightThruster);
+    
+    const leftFlame = new THREE.Mesh(
+        new THREE.ConeGeometry(0.12, 0.4, 8),
+        new THREE.MeshBasicMaterial({ 
+            color: 0xff6600,
+            transparent: true,
+            opacity: 0.8
+        })
+    );
+    leftFlame.position.set(-0.4, 0.3, 1.2);
+    leftFlame.rotation.x = -Math.PI / 2;
+    leftFlame.userData.type = 'flame';
+    player.add(leftFlame);
+    
+    const rightFlame = new THREE.Mesh(
+        new THREE.ConeGeometry(0.12, 0.4, 8),
+        new THREE.MeshBasicMaterial({ 
+            color: 0xff6600,
+            transparent: true,
+            opacity: 0.8
+        })
+    );
+    rightFlame.position.set(0.4, 0.3, 1.2);
+    rightFlame.rotation.x = -Math.PI / 2;
+    rightFlame.userData.type = 'flame';
+    player.add(rightFlame);
+    
+    const glowGeometry = new THREE.SphereGeometry(glowSize, 16, 16);
     const glowMaterial = new THREE.MeshBasicMaterial({ 
-        color: color,
+        color: primaryColor,
         transparent: true,
-        opacity: 0.2
+        opacity: 0.15
     });
     const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+    glow.position.y = 0.5;
     player.add(glow);
 }
 
 function createShield() {
     if (shieldMesh) {
-        scene.remove(shieldMesh);
+        player.remove(shieldMesh);
     }
     
-    const shieldGeometry = new THREE.SphereGeometry(1.8, 16, 16);
+    const shieldGeometry = new THREE.SphereGeometry(2, 16, 16);
     const shieldMaterial = new THREE.MeshBasicMaterial({ 
         color: 0x00ffff,
         transparent: true,
@@ -242,6 +326,7 @@ function createShield() {
         wireframe: true
     });
     shieldMesh = new THREE.Mesh(shieldGeometry, shieldMaterial);
+    shieldMesh.position.y = 0.5;
     player.add(shieldMesh);
 }
 
@@ -466,6 +551,7 @@ function handleKeydown(e) {
 
 function checkCollisions() {
     const playerBox = new THREE.Box3().setFromObject(player);
+    playerBox.expandByScalar(-0.3);
 
     for (let i = obstacles.length - 1; i >= 0; i--) {
         const obstacle = obstacles[i];
@@ -607,7 +693,7 @@ function resetGame() {
     powerups = [];
 
     player.position.x = lanes[1];
-    player.position.y = 1.25;
+    player.position.y = 0.5;
     player.position.z = 5;
 
     document.getElementById('gameOverModal').classList.add('hidden');
@@ -696,11 +782,16 @@ function animate() {
             }
         }
 
-        if (player.position.y > 1.25) {
-            player.rotation.x += 0.1;
-        } else {
-            player.rotation.x = 0;
-        }
+        const targetX = lanes[playerLane];
+        const tilt = (targetX - player.position.x) * 0.05;
+        player.rotation.z = -tilt;
+        
+        player.traverse((child) => {
+            if (child.userData && child.userData.type === 'flame') {
+                const flameScale = 0.8 + Math.random() * 0.4;
+                child.scale.y = flameScale;
+            }
+        });
 
         for (let i = obstacles.length - 1; i >= 0; i--) {
             obstacles[i].position.z += gameSpeed;
