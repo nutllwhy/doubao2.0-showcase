@@ -252,6 +252,15 @@ function applyInlineStyles(html, styles) {
     // th
     result = result.replace(/<th>/g, '<th style="border: 1px solid ' + styles.quoteBorder + '; padding: 10px 15px; text-align: left; background: ' + styles.quoteBg + '; font-weight: bold; color: ' + styles.primary + ';">');
     
+    // ul
+    result = result.replace(/<ul>/g, '<ul style="margin: 15px 0; padding-left: 30px; color: ' + styles.text + ';">');
+    
+    // ol
+    result = result.replace(/<ol>/g, '<ol style="margin: 15px 0; padding-left: 30px; color: ' + styles.text + ';">');
+    
+    // li
+    result = result.replace(/<li>/g, '<li style="margin: 8px 0; color: ' + styles.text + ';">');
+    
     // td
     result = result.replace(/<td>/g, '<td style="border: 1px solid ' + styles.quoteBorder + '; padding: 10px 15px; text-align: left; color: ' + styles.text + ';">');
     
