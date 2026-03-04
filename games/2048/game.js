@@ -3,6 +3,67 @@ const GRID_SIZE = 4;
 const CELL_SIZE = 100;
 const CELL_GAP = 10;
 
+// 音效系统
+let audioContext2048 = null;
+
+function initAudio2048() {
+    if (!audioContext2048) {
+        audioContext2048 = new (window.AudioContext || window.webkitAudioContext)();
+    }
+}
+
+function playSound2048(type) {
+    initAudio2048();
+    if (!audioContext2048) return;
+    
+    const oscillator = audioContext2048.createOscillator();
+    const gainNode = audioContext2048.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext2048.destination);
+    
+    const now = audioContext2048.currentTime;
+    
+    switch(type) {
+        case 'move':
+            oscillator.frequency.setValueAtTime(330, now);
+            oscillator.frequency.exponentialRampToValueAtTime(440, now + 0.1);
+            gainNode.gain.setValueAtTime(0.1, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+            oscillator.start(now);
+            oscillator.stop(now + 0.15);
+            break;
+        case 'merge':
+            oscillator.frequency.setValueAtTime(440, now);
+            oscillator.frequency.exponentialRampToValueAtTime(660, now + 0.1);
+            oscillator.frequency.exponentialRampToValueAtTime(880, now + 0.2);
+            gainNode.gain.setValueAtTime(0.2, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+            oscillator.start(now);
+            oscillator.stop(now + 0.25);
+            break;
+        case 'gameover':
+            oscillator.frequency.setValueAtTime(440, now);
+            oscillator.frequency.exponentialRampToValueAtTime(220, now + 0.3);
+            oscillator.frequency.exponentialRampToValueAtTime(110, now + 0.6);
+            gainNode.gain.setValueAtTime(0.3, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.7);
+            oscillator.start(now);
+            oscillator.stop(now + 0.7);
+            break;
+        case 'win':
+            oscillator.frequency.setValueAtTime(523, now);
+            oscillator.frequency.setValueAtTime(659, now + 0.1);
+            oscillator.frequency.setValueAtTime(784, now + 0.2);
+            oscillator.frequency.setValueAtTime(1047, now + 0.3);
+            gainNode.gain.setValueAtTime(0.3, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+            oscillator.start(now);
+            oscillator.stop(now + 0.5);
+            break;
+    }
+}
+
 // 游戏模式
 let gameMode = 'solo';
 let playerGame = null;
@@ -107,7 +168,11 @@ class Game2048 {
                 this.grid[newR][newC] *= 2;
                 scoreGain += this.grid[newR][newC];
                 this.maxTile = Math.max(this.maxTile, this.grid[newR][newC]);
-                if (this.grid[newR][newC] === 2048) this.won = true;
+                if (this.grid[newR][newC] === 2048) {
+                    this.won = true;
+                    playSound2048('win');
+                }
+                playSound2048('merge');
             } else if (newR !== r || newC !== c) {
                 this.grid[newR][newC] = this.grid[r][c];
             }
@@ -124,6 +189,7 @@ class Game2048 {
             this.render();
             this.updateStats();
             this.checkGameOver();
+            if (scoreGain === 0) playSound2048('move');
             return true;
         }
         return false;
@@ -411,6 +477,7 @@ function handleKeydown(e) {
 }
 
 function showGameOver(title, message) {
+    playSound2048('gameover');
     document.getElementById('modalTitle').textContent = title;
     document.getElementById('modalMessage').textContent = message;
     document.getElementById('gameOverModal').classList.remove('hidden');

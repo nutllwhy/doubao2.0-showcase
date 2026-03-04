@@ -2,6 +2,65 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
+// 音效系统
+let audioContext = null;
+
+function initAudio() {
+    if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+}
+
+function playSound(type) {
+    initAudio();
+    if (!audioContext) return;
+    
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    const now = audioContext.currentTime;
+    
+    switch(type) {
+        case 'eat':
+            oscillator.frequency.setValueAtTime(523, now);
+            oscillator.frequency.exponentialRampToValueAtTime(784, now + 0.1);
+            gainNode.gain.setValueAtTime(0.3, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+            oscillator.start(now);
+            oscillator.stop(now + 0.2);
+            break;
+        case 'powerup':
+            oscillator.frequency.setValueAtTime(440, now);
+            oscillator.frequency.exponentialRampToValueAtTime(880, now + 0.15);
+            oscillator.frequency.exponentialRampToValueAtTime(1320, now + 0.3);
+            gainNode.gain.setValueAtTime(0.3, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+            oscillator.start(now);
+            oscillator.stop(now + 0.4);
+            break;
+        case 'gameover':
+            oscillator.frequency.setValueAtTime(440, now);
+            oscillator.frequency.exponentialRampToValueAtTime(220, now + 0.3);
+            oscillator.frequency.exponentialRampToValueAtTime(110, now + 0.6);
+            gainNode.gain.setValueAtTime(0.3, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.7);
+            oscillator.start(now);
+            oscillator.stop(now + 0.7);
+            break;
+        case 'move':
+            oscillator.frequency.setValueAtTime(220, now);
+            oscillator.frequency.exponentialRampToValueAtTime(247, now + 0.05);
+            gainNode.gain.setValueAtTime(0.1, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+            oscillator.start(now);
+            oscillator.stop(now + 0.1);
+            break;
+    }
+}
+
 // 游戏常量
 const GRID_SIZE = 30;
 const GRID_COUNT = 25;
@@ -163,6 +222,7 @@ function update() {
         score += points;
         document.getElementById('score').textContent = score;
         
+        playSound('eat');
         createParticles(food.x, food.y, food.color);
         generateFood();
     } else {
@@ -173,6 +233,7 @@ function update() {
     for (let i = powerups.length - 1; i >= 0; i--) {
         if (head.x === powerups[i].x && head.y === powerups[i].y) {
             const p = powerups[i];
+            playSound('powerup');
             p.effect();
             createParticles(p.x, p.y, p.color);
             updatePowerupStatus();
@@ -362,6 +423,7 @@ function gameOver() {
         saveHighScore();
         document.getElementById('highScore').textContent = highScore;
     }
+    playSound('gameover');
     document.getElementById('finalScore').textContent = score;
     document.getElementById('gameOverScreen').classList.remove('hidden');
 }
