@@ -131,7 +131,7 @@ class Game2048 {
         return { r, c };
     }
 
-    move(direction, skipRender = false) {
+    move(direction, skipRender = false, skipSound = false) {
         if (this.gameOver) return false;
 
         const oldGrid = JSON.stringify(this.grid);
@@ -171,9 +171,9 @@ class Game2048 {
                 this.maxTile = Math.max(this.maxTile, this.grid[newR][newC]);
                 if (this.grid[newR][newC] === 2048) {
                     this.won = true;
-                    playSound2048('win');
+                    if (!skipSound) playSound2048('win');
                 }
-                playSound2048('merge');
+                if (!skipSound) playSound2048('merge');
             } else if (newR !== r || newC !== c) {
                 this.grid[newR][newC] = this.grid[r][c];
             }
@@ -192,7 +192,7 @@ class Game2048 {
                 this.updateStats();
             }
             this.checkGameOver();
-            if (scoreGain === 0 && !skipRender) playSound2048('move');
+            if (scoreGain === 0 && !skipRender && !skipSound) playSound2048('move');
             return true;
         }
         return false;
@@ -455,7 +455,7 @@ function startAiVs() {
             const aiMove = getBestMove(aiGame);
             console.log('AI选择的方向:', aiMove);
             if (aiMove) {
-                aiGame.move(aiMove);
+                aiGame.move(aiMove, false, true);
                 console.log('AI移动成功！AI分数:', aiGame.score);
             }
             
@@ -483,7 +483,7 @@ function startDemo() {
         if (!isDemoPaused && !playerGame.gameOver) {
             const move = getBestMove(playerGame);
             if (move) {
-                playerGame.move(move);
+                playerGame.move(move, false, false);
                 if (playerGame.gameOver) {
                     stopDemo();
                     showGameOver('AI游戏结束！', `最终分数: ${playerGame.score}`);
