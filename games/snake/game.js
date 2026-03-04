@@ -3,8 +3,8 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
 // 游戏常量
-const GRID_SIZE = 25;
-const GRID_COUNT = 20;
+const GRID_SIZE = 30;
+const GRID_COUNT = 25;
 
 // 游戏状态
 let snake = [];

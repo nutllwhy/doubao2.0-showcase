@@ -24,14 +24,14 @@ header {
 
 header h1 {
     color: #00ff88;
-    font-size: 2.5rem;
+    font-size: 3rem;
     text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 .score-board {
     color: white;
-    font-size: 1.2rem;
+    font-size: 1.5rem;
 }
 
 .score, .high-score {
@@ -76,8 +76,8 @@ header h1 {
 
 .overlay h2 {
     color: #00ff88;
-    font-size: 2rem;
-    margin-bottom: 30px;
+    font-size: 2.5rem;
+    margin-bottom: 40px;
     text-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
 }
 
@@ -88,10 +88,10 @@ header h1 {
 }
 
 .difficulty-btn {
-    padding: 15px 30px;
-    font-size: 1.1rem;
+    padding: 18px 40px;
+    font-size: 1.3rem;
     border: none;
-    border-radius: 10px;
+    border-radius: 12px;
     cursor: pointer;
     transition: all 0.3s ease;
     font-weight: bold;
@@ -118,13 +118,13 @@ header h1 {
 }
 
 .primary-btn, .secondary-btn {
-    padding: 12px 25px;
-    font-size: 1rem;
+    padding: 15px 35px;
+    font-size: 1.2rem;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     cursor: pointer;
     transition: all 0.3s ease;
-    margin: 5px;
+    margin: 8px;
 }
 
 .primary-btn {
@@ -249,18 +249,44 @@ header h1 {
     color: #00ff88;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 900px) {
     header h1 {
-        font-size: 1.8rem;
+        font-size: 2rem;
     }
     
     #gameCanvas {
         width: 100%;
-        max-width: 350px;
+        max-width: 500px;
+        height: auto;
+    }
+    
+    .difficulty-btn {
+        padding: 12px 25px;
+        font-size: 1.1rem;
+    }
+    
+    .overlay h2 {
+        font-size: 1.8rem;
+    }
+}
+
+@media (max-width: 600px) {
+    header h1 {
+        font-size: 1.5rem;
+    }
+    
+    #gameCanvas {
+        width: 100%;
+        max-width: 320px;
         height: auto;
     }
     
     .difficulty-buttons {
         flex-direction: column;
+    }
+    
+    .difficulty-btn {
+        padding: 10px 20px;
+        font-size: 1rem;
     }
 }
