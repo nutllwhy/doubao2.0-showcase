@@ -121,6 +121,7 @@ let hands, videoElement, canvasElement, canvasCtx;
 let isGestureActive = false;
 let lastGesture = null;
 let gestureHoldTime = 0;
+let gamePhase = 'start'; // start, shuffling, cutting, dealing, selecting, reading
 
 function init() {
     showStatus('🔮', '点击下方按钮开始', false, true);
@@ -215,7 +216,13 @@ function onResults(results) {
         const gesture = detectGesture(results.multiHandLandmarks[0]);
         handleGesture(gesture);
     } else {
-        updateGestureDisplay('等待手势...');
+        if (gamePhase === 'selecting') {
+            updateGestureDisplay('等待手势...');
+        } else if (gamePhase === 'shuffling') {
+            updateGestureDisplay('正在洗牌...');
+        } else if (gamePhase === 'reading') {
+            updateGestureDisplay('张开手掌可重新开始');
+        }
         isGestureActive = false;
         gestureHoldTime = 0;
     }
@@ -253,15 +260,25 @@ function detectGesture(landmarks) {
 }
 
 function handleGesture(gesture) {
-    const gestureNames = {
-        'one': '👆 选择第1张牌',
-        'two': '✌️ 选择第2张牌',
-        'three': '🤟 选择第3张牌',
-        'palm': '🖐️ 重新开始',
-        'unknown': '🤔 无法识别'
-    };
+    let hint;
+    if (gamePhase === 'shuffling') {
+        hint = '🔮 正在洗牌...';
+    } else if (gamePhase === 'selecting') {
+        const gestureNames = {
+            'one': '👆 选择第1张牌',
+            'two': '✌️ 选择第2张牌',
+            'three': '🤟 选择第3张牌',
+            'palm': '🖐️ 重新开始',
+            'unknown': '🤔 无法识别'
+        };
+        hint = gestureNames[gesture] || '等待手势...';
+    } else if (gamePhase === 'reading') {
+        hint = '🖐️ 张开手掌重新开始';
+    } else {
+        hint = '等待...';
+    }
 
-    updateGestureDisplay(gestureNames[gesture] || '等待手势...');
+    updateGestureDisplay(hint);
 
     if (gesture === lastGesture && gesture !== 'unknown') {
         gestureHoldTime++;
@@ -319,6 +336,7 @@ function initCards() {
     const container = document.getElementById('cardsContainer');
     container.innerHTML = '';
     selectedCards = [];
+    gamePhase = 'shuffling';
     
     const numCards = currentSpread === 'one' ? 3 : 5;
     const shuffled = [...tarotCards].sort(() => Math.random() - 0.5).slice(0, numCards);
@@ -338,12 +356,36 @@ function initCards() {
                 </div>
             </div>
         `;
+        cardEl.style.opacity = '0';
         cardEl.addEventListener('click', () => selectCard(index));
         container.appendChild(cardEl);
     });
 
     document.getElementById('readingSection').classList.remove('show');
     document.getElementById('actionButtons').style.display = 'none';
+    
+    startShufflingAnimation();
+}
+
+function startShufflingAnimation() {
+    const cards = document.querySelectorAll('.card');
+    cards.forEach((card, i) => {
+        setTimeout(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'rotate(' + (Math.random() * 30 - 15) + 'deg) translateY(-20px)';
+        }, i * 100);
+    });
+    
+    setTimeout(() => {
+        cards.forEach((card, i) => {
+            card.style.transition = 'transform 0.5s ease, opacity 0.5s ease';
+            card.style.transform = 'rotate(0deg) translateY(0)';
+        });
+        setTimeout(() => {
+            gamePhase = 'selecting';
+            updateGestureDisplay('现在可以用手势选牌了！');
+        }, 600);
+    }, cards.length * 100 + 500);
 }
 
 function selectCard(index) {
@@ -387,12 +429,14 @@ function showReading(type) {
     container.innerHTML = html;
     document.getElementById('readingSection').classList.add('show');
     document.getElementById('actionButtons').style.display = 'flex';
+    gamePhase = 'reading';
 }
 
 function resetGame() {
     initCards();
     isGestureActive = false;
     gestureHoldTime = 0;
+    gamePhase = 'shuffling';
 }
 
 function showStatus(icon, text, showRefresh = false, showStart = false) {
