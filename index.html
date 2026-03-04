@@ -13,7 +13,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: #faf8f5;
             min-height: 100vh;
             padding: 40px 20px;
         }
@@ -25,25 +25,28 @@
 
         header {
             text-align: center;
-            color: #2d3748;
+            color: #1f2937;
             margin-bottom: 60px;
         }
 
         header h1 {
-            font-size: 3rem;
+            font-size: 2.5rem;
             margin-bottom: 15px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
         }
 
         header p {
-            font-size: 1.2rem;
-            color: #4a5568;
+            font-size: 1.1rem;
+            color: #6b7280;
         }
 
         .section-title {
-            color: #2d3748;
-            font-size: 1.8rem;
+            color: #1f2937;
+            font-size: 1.5rem;
             margin-bottom: 30px;
             text-align: center;
+            font-weight: 600;
         }
 
         .cards-grid {
@@ -55,31 +58,32 @@
 
         .card {
             background: white;
-            border-radius: 20px;
+            border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04);
             transition: all 0.3s ease;
             cursor: pointer;
+            border: 1px solid rgba(0,0,0,0.04);
         }
 
         .card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1), 0 16px 48px rgba(0,0,0,0.06);
         }
 
         .card-icon {
-            font-size: 4rem;
+            font-size: 3.5rem;
             text-align: center;
-            padding: 40px 20px 20px;
-            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 35px 20px 15px;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
         }
 
         .card.game .card-icon {
-            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
         }
 
         .card.tool .card-icon {
-            background: linear-gradient(135deg, #d4fc79 0%, #96e6a1 100%);
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
         }
 
         .card-content {
