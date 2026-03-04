@@ -28,7 +28,29 @@ header {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 15px;
-    gap: 10px;
+    gap: 20px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.header-left,
+.header-right {
+    flex: 0 0 auto;
+    min-width: 100px;
+}
+
+.header-left {
+    text-align: left;
+}
+
+.header-right {
+    text-align: right;
+}
+
+.header-center {
+    flex: 1 1 auto;
+    text-align: center;
 }
 
 .home-btn {
