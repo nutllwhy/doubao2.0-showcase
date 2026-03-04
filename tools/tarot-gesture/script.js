@@ -1,4 +1,12 @@
 // 手势塔罗 - 神秘运势解读
+const HAND_CONNECTIONS = window.HAND_CONNECTIONS || [
+    [0, 1], [1, 2], [2, 3], [3, 4],
+    [0, 5], [5, 6], [6, 7], [7, 8],
+    [5, 9], [9, 10], [10, 11], [11, 12],
+    [9, 13], [13, 14], [14, 15], [15, 16],
+    [13, 17], [0, 17], [17, 18], [18, 19], [19, 20]
+];
+
 const tarotCards = [
     { name: "愚者", icon: "🃏", meaning: "新的开始、冒险、天真", 
       love: "爱情上有新的机会，保持开放的心态去迎接。",
@@ -171,28 +179,23 @@ async function requestCameraPermission() {
         videoElement.srcObject = stream;
         await videoElement.play();
         
-        showStatus('🔮', '正在加载手势识别...');
+        showStatus('🔮', '正在启动手势识别...');
         
-        setTimeout(() => {
-            hideStatus();
-            startGestureDetection();
-        }, 800);
+        const camera = new Camera(videoElement, {
+            onFrame: async () => {
+                await hands.send({ image: videoElement });
+            },
+            width: 640,
+            height: 480
+        });
+        
+        await camera.start();
+        hideStatus();
         
     } catch (err) {
         console.error('Camera error:', err);
         showStatus('⚠️', '无法访问摄像头，请检查权限设置后刷新页面', true);
     }
-}
-
-async function startGestureDetection() {
-    async function onFrame() {
-        try {
-            await hands.send({ image: videoElement });
-        } catch (e) {
-        }
-        requestAnimationFrame(onFrame);
-    }
-    onFrame();
 }
 
 function onResults(results) {
