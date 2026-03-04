@@ -1,4 +1,6 @@
 // 手势塔罗 - 神秘运势解读
+console.log('🔮 手势塔罗已加载 - 版本: 2025-03-05-洗牌动画版');
+
 const HAND_CONNECTIONS = window.HAND_CONNECTIONS || [
     [0, 1], [1, 2], [2, 3], [3, 4],
     [0, 5], [5, 6], [6, 7], [7, 8],
