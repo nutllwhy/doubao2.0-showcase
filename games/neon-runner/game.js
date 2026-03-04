@@ -636,27 +636,8 @@ function animate() {
             }
         }
 
-        if (distance - lastObstacleDist > 20) {
+        if (distance - lastObstacleDist > 35) {
             spawnObstacle();
-            if (Math.random() > 0.6) {
-                const extraObstacleGeometry = new THREE.BoxGeometry(1.5, 2, 1.5);
-                const extraObstacleMaterial = new THREE.MeshPhongMaterial({ 
-                    color: 0xff0055,
-                    emissive: 0xff0055,
-                    emissiveIntensity: 0.5
-                });
-                const extraObstacle = new THREE.Mesh(extraObstacleGeometry, extraObstacleMaterial);
-                let extraLane = Math.floor(Math.random() * 3);
-                while (extraLane === lanes.indexOf(obstacles[obstacles.length - 1].position.x) && obstacles.length > 0) {
-                    extraLane = Math.floor(Math.random() * 3);
-                }
-                extraObstacle.position.x = lanes[extraLane];
-                extraObstacle.position.y = 1;
-                extraObstacle.position.z = -90 - Math.random() * 20;
-                extraObstacle.userData.type = 'obstacle';
-                scene.add(extraObstacle);
-                obstacles.push(extraObstacle);
-            }
         }
         if (distance - lastCoinDist > 15) {
             spawnCoin();
