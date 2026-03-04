@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS渐变生成器</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎨 CSS渐变生成器</h1>
+        </header>
+
+        <div class="main-content">
+            <div class="preview-section">
+                <div class="preview-header">
+                    <h2>👁️ 预览</h2>
+                    <div class="preview-size">
+                        <label>宽度:</label>
+                        <input type="range" id="previewWidth" min="200" max="800" value="400">
+                        <span id="previewWidthValue">400px</span>
+                    </div>
+                </div>
+                <div id="preview" class="preview"></div>
+                <div class="copy-section">
+                    <button id="copyCodeBtn" class="copy-btn">📋 复制CSS代码</button>
+                    <span id="copyStatus" class="copy-status"></span>
+                </div>
+                <div class="code-output">
+                    <h3>CSS代码</h3>
+                    <pre><code id="cssCode"></code></pre>
+                </div>
+            </div>
+
+            <div class="controls-section">
+                <div class="control-group">
+                    <h3>渐变类型</h3>
+                    <div class="type-buttons">
+                        <button class="type-btn active" data-type="linear">📐 线性渐变</button>
+                        <button class="type-btn" data-type="radial">⭕ 径向渐变</button>
+                        <button class="type-btn" data-type="repeating-linear">🔁 重复线性</button>
+                        <button class="type-btn" data-type="repeating-radial">🔁 重复径向</button>
+                    </div>
+                </div>
+
+                <div class="control-group" id="linearControls">
+                    <h3>方向与角度</h3>
+                    <div class="direction-grid">
+                        <button class="dir-btn" data-dir="to top">↑</button>
+                        <button class="dir-btn" data-dir="to top right">↗</button>
+                        <button class="dir-btn" data-dir="to right">→</button>
+                        <button class="dir-btn" data-dir="to bottom right">↘</button>
+                        <button class="dir-btn active" data-dir="to bottom">↓</button>
+                        <button class="dir-btn" data-dir="to bottom left">↙</button>
+                        <button class="dir-btn" data-dir="to left">←</button>
+                        <button class="dir-btn" data-dir="to top left">↖</button>
+                    </div>
+                    <div class="slider-control">
+                        <label>角度: <span id="angleValue">180°</span></label>
+                        <input type="range" id="angleSlider" min="0" max="360" value="180">
+                    </div>
+                </div>
+
+                <div class="control-group hidden" id="radialControls">
+                    <h3>径向设置</h3>
+                    <div class="shape-buttons">
+                        <button class="shape-btn active" data-shape="circle">⭕ 圆形</button>
+                        <button class="shape-btn" data-shape="ellipse">🔵 椭圆</button>
+                    </div>
+                    <div class="slider-control">
+                        <label>大小: <span id="sizeValue">50%</span></label>
+                        <input type="range" id="sizeSlider" min="10" max="100" value="50">
+                    </div>
+                    <div class="position-grid">
+                        <button class="pos-btn" data-pos="top left">↖</button>
+                        <button class="pos-btn" data-pos="top">↑</button>
+                        <button class="pos-btn" data-pos="top right">↗</button>
+                        <button class="pos-btn" data-pos="left">←</button>
+                        <button class="pos-btn active" data-pos="center">●</button>
+                        <button class="pos-btn" data-pos="right">→</button>
+                        <button class="pos-btn" data-pos="bottom left">↙</button>
+                        <button class="pos-btn" data-pos="bottom">↓</button>
+                        <button class="pos-btn" data-pos="bottom right">↘</button>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>颜色停止点</h3>
+                    <div id="colorStops" class="color-stops"></div>
+                    <button id="addColorBtn" class="add-color-btn">➕ 添加颜色</button>
+                </div>
+
+                <div class="control-group">
+                    <h3>预设方案</h3>
+                    <div class="presets">
+                        <div class="preset-category">
+                            <h4>🌈 自然</h4>
+                            <div class="preset-grid">
+                                <div class="preset" data-colors="#667eea,#764ba2" data-name="日落"></div>
+                                <div class="preset" data-colors="#f093fb,#f5576c" data-name="樱花"></div>
+                                <div class="preset" data-colors="#4facfe,#00f2fe" data-name="海洋"></div>
+                                <div class="preset" data-colors="#43e97b,#38f9d7" data-name="森林"></div>
+                            </div>
+                        </div>
+                        <div class="preset-category">
+                            <h4>🚀 科技</h4>
+                            <div class="preset-grid">
+                                <div class="preset" data-colors="#21d4fd,#b721ff" data-name="霓虹"></div>
+                                <div class="preset" data-colors="#a18cd1,#fbc2eb" data-name="梦幻"></div>
+                                <div class="preset" data-colors="#30cfd0,#330867" data-name="深空"></div>
+                                <div class="preset" data-colors="#0c3483,#a2b6df" data-name="商务"></div>
+                            </div>
+                        </div>
+                        <div class="preset-category">
+                            <h4>🔥 温暖</h4>
+                            <div class="preset-grid">
+                                <div class="preset" data-colors="#fa709a,#fee140" data-name="暖阳"></div>
+                                <div class="preset" data-colors="#ff9a9e,#fecfef" data-name="蜜桃"></div>
+                                <div class="preset" data-colors="#ffecd2,#fcb69f" data-name="香槟"></div>
+                                <div class="preset" data-colors="#ff6e7f,#bfe9ff" data-name="冰橙"></div>
+                            </div>
+                        </div>
+                        <div class="preset-category">
+                            <h4>✨ 炫酷</h4>
+                            <div class="preset-grid">
+                                <div class="preset" data-colors="#89f7fe,#66a6ff" data-name="冰蓝"></div>
+                                <div class="preset" data-colors="#f6d365,#fda085" data-name="火焰"></div>
+                                <div class="preset" data-colors="#e0c3fc,#8ec5fc" data-name="极光"></div>
+                                <div class="preset" data-colors="#ff0844,#ffb199" data-name="激情"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="back-link">
+            <a href="../../index.html">← 返回主页</a>
+        </div>
+    </div>
+
+    <div id="notification" class="notification hidden"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
