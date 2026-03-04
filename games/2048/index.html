@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2048 AI对战版</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 2048 AI对战版</h1>
+            <div class="game-modes">
+                <button class="mode-btn active" data-mode="solo">🎮 单人模式</button>
+                <button class="mode-btn" data-mode="ai-vs">⚔️ AI对战</button>
+                <button class="mode-btn" data-mode="ai-demo">🤖 AI演示</button>
+            </div>
+        </header>
+
+        <div class="game-container">
+            <div id="playerBoard" class="board-container">
+                <div class="board-header">
+                    <h2>玩家</h2>
+                    <div class="stats">
+                        <span class="stat">分数: <span id="playerScore">0</span></span>
+                        <span class="stat">步数: <span id="playerMoves">0</span></span>
+                        <span class="stat">最大: <span id="playerMax">0</span></span>
+                    </div>
+                </div>
+                <div class="grid-container">
+                    <div id="playerGrid" class="grid"></div>
+                </div>
+            </div>
+
+            <div id="aiBoard" class="board-container hidden">
+                <div class="board-header">
+                    <h2>AI</h2>
+                    <div class="stats">
+                        <span class="stat">分数: <span id="aiScore">0</span></span>
+                        <span class="stat">步数: <span id="aiMoves">0</span></span>
+                        <span class="stat">最大: <span id="aiMax">0</span></span>
+                    </div>
+                </div>
+                <div class="grid-container">
+                    <div id="aiGrid" class="grid"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-info">
+            <div id="gameMessage" class="message"></div>
+            <div class="controls">
+                <button id="newGameBtn" class="primary-btn">🔄 新游戏</button>
+                <div id="demoControls" class="demo-controls hidden">
+                    <label for="demoSpeed">演示速度:</label>
+                    <input type="range" id="demoSpeed" min="100" max="1000" value="500">
+                    <button id="pauseDemoBtn" class="secondary-btn">⏸️ 暂停</button>
+                </div>
+            </div>
+            <div class="instructions">
+                <p>🎮 方向键 / WASD 移动方块</p>
+                <p>🏆 相同数字合并，目标2048！</p>
+            </div>
+        </div>
+
+        <div class="back-link">
+            <a href="../../index.html">← 返回主页</a>
+        </div>
+    </div>
+
+    <div id="gameOverModal" class="modal hidden">
+        <div class="modal-content">
+            <h2 id="modalTitle">游戏结束！</h2>
+            <p id="modalMessage"></p>
+            <button id="modalNewGame" class="primary-btn">再来一局</button>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>

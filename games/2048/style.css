@@ -1,0 +1,334 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: linear-gradient(135deg, #faf8ef 0%, #f5f0e1 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    text-align: center;
+    max-width: 1200px;
+    width: 100%;
+}
+
+header {
+    margin-bottom: 30px;
+}
+
+header h1 {
+    color: #776e65;
+    font-size: 3rem;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.game-modes {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.mode-btn {
+    padding: 12px 25px;
+    font-size: 1rem;
+    border: 2px solid #bbada0;
+    background: white;
+    color: #776e65;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: bold;
+}
+
+.mode-btn:hover {
+    background: #8f7a66;
+    color: white;
+    border-color: #8f7a66;
+}
+
+.mode-btn.active {
+    background: #8f7a66;
+    color: white;
+    border-color: #8f7a66;
+}
+
+.game-container {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+}
+
+.board-container {
+    background: #bbada0;
+    padding: 15px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+}
+
+.board-container.hidden {
+    display: none;
+}
+
+.board-header {
+    margin-bottom: 15px;
+}
+
+.board-header h2 {
+    color: white;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.stats {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    color: white;
+    font-size: 1rem;
+}
+
+.grid-container {
+    background: #bbada0;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    position: relative;
+}
+
+.cell {
+    width: 100px;
+    height: 100px;
+    background: rgba(238, 228, 218, 0.35);
+    border-radius: 8px;
+}
+
+.tile {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.5rem;
+    font-weight: bold;
+    border-radius: 8px;
+    transition: all 0.15s ease;
+}
+
+.tile.new {
+    animation: appear 0.2s ease;
+}
+
+.tile.merged {
+    animation: pop 0.2s ease;
+}
+
+@keyframes appear {
+    0% { transform: scale(0); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.tile-2 { background: #eee4da; color: #776e65; }
+.tile-4 { background: #ede0c8; color: #776e65; }
+.tile-8 { background: #f2b179; color: #f9f6f2; }
+.tile-16 { background: #f59563; color: #f9f6f2; }
+.tile-32 { background: #f67c5f; color: #f9f6f2; }
+.tile-64 { background: #f65e3b; color: #f9f6f2; }
+.tile-128 { background: #edcf72; color: #f9f6f2; font-size: 2rem; }
+.tile-256 { background: #edcc61; color: #f9f6f2; font-size: 2rem; }
+.tile-512 { background: #edc850; color: #f9f6f2; font-size: 2rem; }
+.tile-1024 { background: #edc53f; color: #f9f6f2; font-size: 1.5rem; }
+.tile-2048 { background: #edc22e; color: #f9f6f2; font-size: 1.5rem; }
+.tile-super { background: #3c3a32; color: #f9f6f2; font-size: 1.2rem; }
+
+.game-info {
+    margin-bottom: 20px;
+}
+
+.message {
+    min-height: 40px;
+    font-size: 1.2rem;
+    color: #776e65;
+    margin-bottom: 15px;
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+}
+
+.primary-btn, .secondary-btn {
+    padding: 12px 30px;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: bold;
+}
+
+.primary-btn {
+    background: #8f7a66;
+    color: white;
+}
+
+.secondary-btn {
+    background: #bbada0;
+    color: white;
+}
+
+.primary-btn:hover, .secondary-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.demo-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.demo-controls.hidden {
+    display: none;
+}
+
+.demo-controls label {
+    color: #776e65;
+}
+
+.demo-controls input[type="range"] {
+    width: 150px;
+}
+
+.instructions {
+    color: #8f7a66;
+}
+
+.instructions p {
+    margin: 5px 0;
+}
+
+.back-link {
+    margin-top: 20px;
+}
+
+.back-link a {
+    color: #8f7a66;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.back-link a:hover {
+    color: #776e65;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: white;
+    padding: 40px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+}
+
+.modal-content h2 {
+    color: #776e65;
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.modal-content p {
+    color: #8f7a66;
+    font-size: 1.2rem;
+    margin-bottom: 25px;
+}
+
+@media (max-width: 900px) {
+    .game-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .cell, .tile {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .tile {
+        font-size: 2rem;
+    }
+    
+    .tile-128, .tile-256, .tile-512 {
+        font-size: 1.5rem;
+    }
+    
+    .tile-1024, .tile-2048 {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 500px) {
+    header h1 {
+        font-size: 2rem;
+    }
+    
+    .cell, .tile {
+        width: 65px;
+        height: 65px;
+    }
+    
+    .tile {
+        font-size: 1.5rem;
+    }
+    
+    .tile-128, .tile-256, .tile-512 {
+        font-size: 1.2rem;
+    }
+    
+    .tile-1024, .tile-2048 {
+        font-size: 1rem;
+    }
+}
