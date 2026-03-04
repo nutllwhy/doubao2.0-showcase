@@ -69,6 +69,7 @@ let gameMode = 'solo';
 let playerGame = null;
 let aiGame = null;
 let demoInterval = null;
+let aiVsInterval = null;
 let isDemoPaused = false;
 
 // 方块颜色类
@@ -383,21 +384,13 @@ function init() {
             const dir = btn.dataset.dir;
             const moved = playerGame.move(dir);
             
-            if (moved && gameMode === 'ai-vs' && !aiGame.gameOver) {
-                setTimeout(() => {
-                    const aiMove = getBestMove(aiGame);
-                    if (aiMove) aiGame.move(aiMove);
-                    
-                    if (playerGame.gameOver) {
-                        if (gameMode === 'ai-vs' && !aiGame.gameOver) {
-                            showGameOver('AI获胜！', `玩家: ${playerGame.score} vs AI: ${aiGame.score}`);
-                        } else {
-                            showGameOver('游戏结束！', `最终分数: ${playerGame.score}`);
-                        }
-                    } else if (gameMode === 'ai-vs' && aiGame.gameOver && !playerGame.gameOver) {
-                        showGameOver('玩家获胜！', `玩家: ${playerGame.score} vs AI: ${aiGame.score}`);
-                    }
-                }, 300);
+            if (playerGame.gameOver) {
+                stopAiVs();
+                if (gameMode === 'ai-vs' && !aiGame.gameOver) {
+                    showGameOver('AI获胜！', `玩家: ${playerGame.score} vs AI: ${aiGame.score}`);
+                } else {
+                    showGameOver('游戏结束！', `最终分数: ${playerGame.score}`);
+                }
             }
         });
     });
@@ -408,6 +401,7 @@ function init() {
 function setGameMode(mode) {
     gameMode = mode;
     stopDemo();
+    stopAiVs();
     
     const aiBoard = document.getElementById('aiBoard');
     const demoControls = document.getElementById('demoControls');
@@ -432,9 +426,11 @@ function setGameMode(mode) {
 
 function newGame() {
     stopDemo();
+    stopAiVs();
     playerGame.init();
     if (gameMode === 'ai-vs') {
         aiGame.init();
+        startAiVs();
     }
     if (gameMode === 'ai-demo') {
         startDemo();
@@ -442,6 +438,29 @@ function newGame() {
     document.getElementById('gameMessage').textContent = gameMode === 'solo' ? '使用方向键或WASD开始游戏！' : 
                                                           gameMode === 'ai-vs' ? '玩家 vs AI - 同时开始！' :
                                                           'AI自动演示中...';
+}
+
+function startAiVs() {
+    aiVsInterval = setInterval(() => {
+        if (!aiGame.gameOver && !playerGame.gameOver) {
+            const aiMove = getBestMove(aiGame);
+            if (aiMove) aiGame.move(aiMove);
+            
+            if (aiGame.gameOver && !playerGame.gameOver) {
+                stopAiVs();
+                showGameOver('玩家获胜！', `玩家: ${playerGame.score} vs AI: ${aiGame.score}`);
+            }
+        } else {
+            stopAiVs();
+        }
+    }, 800);
+}
+
+function stopAiVs() {
+    if (aiVsInterval) {
+        clearInterval(aiVsInterval);
+        aiVsInterval = null;
+    }
 }
 
 function startDemo() {
@@ -486,27 +505,21 @@ function handleKeydown(e) {
     if (keyMap[e.key]) {
         e.preventDefault();
         const moved = playerGame.move(keyMap[e.key]);
-        
-        if (moved && gameMode === 'ai-vs' && !aiGame.gameOver) {
-            setTimeout(() => {
-                const aiMove = getBestMove(aiGame);
-                if (aiMove) aiGame.move(aiMove);
-            }, 300);
-        }
 
         if (playerGame.gameOver) {
+            stopAiVs();
             if (gameMode === 'ai-vs' && !aiGame.gameOver) {
                 showGameOver('AI获胜！', `玩家: ${playerGame.score} vs AI: ${aiGame.score}`);
             } else {
                 showGameOver('游戏结束！', `最终分数: ${playerGame.score}`);
             }
-        } else if (gameMode === 'ai-vs' && aiGame.gameOver && !playerGame.gameOver) {
-            showGameOver('玩家获胜！', `玩家: ${playerGame.score} vs AI: ${aiGame.score}`);
         }
     }
 }
 
 function showGameOver(title, message) {
+    stopAiVs();
+    stopDemo();
     playSound2048('gameover');
     document.getElementById('modalTitle').textContent = title;
     document.getElementById('modalMessage').textContent = message;
