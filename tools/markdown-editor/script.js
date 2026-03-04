@@ -199,7 +199,19 @@ function updatePreview() {
     
     // 把样式应用到内联样式，确保复制到公众号时能保留
     const styledHtml = applyInlineStyles(html, styles);
-    preview.innerHTML = '<div class="wechat-content" style="background: ' + styles.bg + '; color: ' + styles.text + ';">' + styledHtml + '</div>';
+    
+    // 用表格包裹，表格背景色在公众号更稳定
+    preview.innerHTML = `
+        <table style="width: 100%; border-collapse: collapse; margin: 0; padding: 0;">
+            <tr>
+                <td style="background: ${styles.bg}; padding: 30px 20px;">
+                    <div style="max-width: 680px; margin: 0 auto; color: ${styles.text}; font-size: 16px; line-height: 1.8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                        ${styledHtml}
+                    </div>
+                </td>
+            </tr>
+        </table>
+    `;
 }
 
 function applyInlineStyles(html, styles) {
