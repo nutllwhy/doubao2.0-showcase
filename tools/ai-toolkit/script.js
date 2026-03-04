@@ -158,6 +158,7 @@ function bindEvents() {
     document.getElementById('saveSettingsBtn').addEventListener('click', saveSettingsAndClose);
     document.getElementById('resetSettingsBtn').addEventListener('click', resetSettings);
     document.getElementById('welcomeConfigBtn').addEventListener('click', openSettings);
+    document.getElementById('testApiBtn').addEventListener('click', testAPI);
 
     document.getElementById('providerSelect').addEventListener('change', (e) => {
         const preset = providerPresets[e.target.value];
@@ -219,6 +220,103 @@ function resetSettings() {
     };
     saveSettings();
     closeSettings();
+}
+
+async function testAPI() {
+    const tempProvider = document.getElementById('providerSelect').value;
+    const tempBaseUrl = document.getElementById('baseUrlInput').value.trim();
+    const tempApiKey = document.getElementById('apiKeyInput').value.trim();
+    const tempModel = document.getElementById('modelInput').value.trim();
+    
+    if (!tempApiKey) {
+        alert('请输入API Key');
+        return;
+    }
+    if (!tempModel) {
+        alert('请输入模型名称');
+        return;
+    }
+    if (!tempBaseUrl) {
+        alert('请输入API Base URL');
+        return;
+    }
+    
+    showLoading('正在测试API...');
+    
+    try {
+        const url = tempBaseUrl.endsWith('/') 
+            ? tempBaseUrl + 'chat/completions' 
+            : tempBaseUrl + '/chat/completions';
+        
+        let headers, body;
+        
+        if (tempProvider === 'anthropic') {
+            const msgUrl = tempBaseUrl.endsWith('/') 
+                ? tempBaseUrl + 'messages' 
+                : tempBaseUrl + '/messages';
+            
+            headers = {
+                'Content-Type': 'application/json',
+                'x-api-key': tempApiKey,
+                'anthropic-version': '2023-06-01'
+            };
+            
+            body = JSON.stringify({
+                model: tempModel,
+                max_tokens: 100,
+                messages: [
+                    { role: 'user', content: '你好，请回复"API测试成功"' }
+                ]
+            });
+            
+            const response = await fetch(msgUrl, {
+                method: 'POST',
+                headers,
+                body
+            });
+            
+            if (!response.ok) {
+                const error = await response.text();
+                throw new Error(`API测试失败：${response.status} - ${error}`);
+            }
+            
+            const data = await response.json();
+            hideLoading();
+            alert('✅ API测试成功！\n\n模型返回：' + data.content[0].text);
+        } else {
+            headers = {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${tempApiKey}`
+            };
+            
+            body = JSON.stringify({
+                model: tempModel,
+                messages: [
+                    { role: 'user', content: '你好，请回复"API测试成功"' }
+                ],
+                max_tokens: 50
+            });
+            
+            const response = await fetch(url, {
+                method: 'POST',
+                headers,
+                body
+            });
+            
+            if (!response.ok) {
+                const error = await response.text();
+                throw new Error(`API测试失败：${response.status} - ${error}`);
+            }
+            
+            const data = await response.json();
+            hideLoading();
+            alert('✅ API测试成功！\n\n模型返回：' + data.choices[0].message.content);
+        }
+    } catch (err) {
+        hideLoading();
+        console.error('API Test Error:', err);
+        alert('❌ API测试失败：\n\n' + err.message + '\n\n请检查：\n1. API Base URL是否正确\n2. API Key是否正确\n3. 模型名称是否正确\n4. 网络连接是否正常');
+    }
 }
 
 function openTool(toolId) {
