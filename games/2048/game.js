@@ -112,8 +112,8 @@ class Game2048 {
         this.won = false;
         this.addRandomTile();
         this.addRandomTile();
-        this.render();
-        this.updateStats();
+        if (this.gridElement) this.render();
+        if (this.scoreElement) this.updateStats();
     }
 
     addRandomTile() {
@@ -227,6 +227,8 @@ class Game2048 {
     }
 
     render() {
+        if (!this.gridElement) return;
+        
         this.gridElement.innerHTML = '';
         
         for (let r = 0; r < GRID_SIZE; r++) {
@@ -253,9 +255,9 @@ class Game2048 {
     }
 
     updateStats() {
-        this.scoreElement.textContent = this.score;
-        this.movesElement.textContent = this.moves;
-        this.maxElement.textContent = this.maxTile;
+        if (this.scoreElement) this.scoreElement.textContent = this.score;
+        if (this.movesElement) this.movesElement.textContent = this.moves;
+        if (this.maxElement) this.maxElement.textContent = this.maxTile;
     }
 
     clone() {
