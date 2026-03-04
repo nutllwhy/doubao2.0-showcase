@@ -399,6 +399,7 @@ function init() {
 }
 
 function setGameMode(mode) {
+    console.log('设置游戏模式:', mode);
     gameMode = mode;
     stopDemo();
     stopAiVs();
@@ -425,10 +426,12 @@ function setGameMode(mode) {
 }
 
 function newGame() {
+    console.log('新游戏！模式:', gameMode);
     stopDemo();
     stopAiVs();
     playerGame.init();
     if (gameMode === 'ai-vs') {
+        console.log('初始化AI游戏并启动AI对战');
         aiGame.init();
         startAiVs();
     }
@@ -441,16 +444,23 @@ function newGame() {
 }
 
 function startAiVs() {
+    console.log('AI对战开始！');
     aiVsInterval = setInterval(() => {
         if (!aiGame.gameOver && !playerGame.gameOver) {
+            console.log('AI尝试移动...');
             const aiMove = getBestMove(aiGame);
-            if (aiMove) aiGame.move(aiMove);
+            console.log('AI选择的方向:', aiMove);
+            if (aiMove) {
+                aiGame.move(aiMove);
+                console.log('AI移动成功！AI分数:', aiGame.score);
+            }
             
             if (aiGame.gameOver && !playerGame.gameOver) {
                 stopAiVs();
                 showGameOver('玩家获胜！', `玩家: ${playerGame.score} vs AI: ${aiGame.score}`);
             }
         } else {
+            console.log('游戏结束，停止AI');
             stopAiVs();
         }
     }, 800);
