@@ -259,15 +259,14 @@ function applyInlineStyles(html, styles) {
 }
 
 function copyToWechat() {
-    const content = preview.querySelector('.wechat-content');
-    if (!content) {
+    if (!editor.value.trim()) {
         alert('请先输入内容');
         return;
     }
 
-    // 创建一个临时div，确保只复制带内联样式的内容
+    // 创建一个临时div，把preview的内容复制过去
     const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = content.innerHTML;
+    tempDiv.innerHTML = preview.innerHTML;
     
     // 添加到body但隐藏
     tempDiv.style.position = 'absolute';
