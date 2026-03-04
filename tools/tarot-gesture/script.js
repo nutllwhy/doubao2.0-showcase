@@ -115,7 +115,7 @@ let lastGesture = null;
 let gestureHoldTime = 0;
 
 function init() {
-    showStatus('📷', '请允许访问摄像头', true);
+    showStatus('🔮', '点击下方按钮开始', false, true);
     
     videoElement = document.getElementById('video');
     canvasElement = document.getElementById('canvas');
@@ -134,7 +134,6 @@ function init() {
 
     hands.onResults(onResults);
 
-    requestCameraPermission();
     initCards();
     
     document.querySelectorAll('.spread-btn').forEach(btn => {
@@ -388,11 +387,13 @@ function resetGame() {
     gestureHoldTime = 0;
 }
 
-function showStatus(icon, text, showRefresh = false) {
+function showStatus(icon, text, showRefresh = false, showStart = false) {
     document.getElementById('statusIcon').textContent = icon;
     document.getElementById('statusText').textContent = text;
     
     let refreshBtn = document.getElementById('refreshBtn');
+    let startBtn = document.getElementById('startBtn');
+    
     if (showRefresh) {
         if (!refreshBtn) {
             refreshBtn = document.createElement('button');
@@ -417,6 +418,45 @@ function showStatus(icon, text, showRefresh = false) {
     } else {
         if (refreshBtn) {
             refreshBtn.style.display = 'none';
+        }
+    }
+    
+    if (showStart) {
+        if (!startBtn) {
+            startBtn = document.createElement('button');
+            startBtn.id = 'startBtn';
+            startBtn.style.cssText = `
+                margin-top: 30px;
+                padding: 15px 40px;
+                background: linear-gradient(135deg, #9d4edd 0%, #7b2cbf 100%);
+                border: none;
+                border-radius: 10px;
+                color: white;
+                font-size: 1.2rem;
+                cursor: pointer;
+                font-family: Georgia, serif;
+                transition: all 0.3s ease;
+                box-shadow: 0 0 30px rgba(157, 78, 221, 0.5);
+            `;
+            startBtn.textContent = '✨ 开始体验';
+            startBtn.onclick = () => {
+                startBtn.style.display = 'none';
+                requestCameraPermission();
+            };
+            startBtn.addEventListener('mouseenter', () => {
+                startBtn.style.transform = 'translateY(-3px)';
+                startBtn.style.boxShadow = '0 10px 40px rgba(157, 78, 221, 0.6)';
+            });
+            startBtn.addEventListener('mouseleave', () => {
+                startBtn.style.transform = 'translateY(0)';
+                startBtn.style.boxShadow = '0 0 30px rgba(157, 78, 221, 0.5)';
+            });
+            document.getElementById('statusOverlay').appendChild(startBtn);
+        }
+        startBtn.style.display = 'block';
+    } else {
+        if (startBtn) {
+            startBtn.style.display = 'none';
         }
     }
     
