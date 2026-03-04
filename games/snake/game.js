@@ -52,7 +52,35 @@ function init() {
     document.getElementById('saveScoreBtn').addEventListener('click', saveScore);
     document.getElementById('restartBtn').addEventListener('click', restartGame);
     
+    document.getElementById('pauseBtn').addEventListener('click', togglePause);
+    
+    // 触摸控制
+    document.querySelectorAll('.touch-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const dirMap = {
+                'up': { x: 0, y: -1 },
+                'down': { x: 0, y: 1 },
+                'left': { x: -1, y: 0 },
+                'right': { x: 1, y: 0 }
+            };
+            const dir = dirMap[btn.dataset.dir];
+            if (dir && gameLoop && !isPaused) {
+                if (dir.y === -1 && direction.y !== 1) nextDirection = dir;
+                if (dir.y === 1 && direction.y !== -1) nextDirection = dir;
+                if (dir.x === -1 && direction.x !== 1) nextDirection = dir;
+                if (dir.x === 1 && direction.x !== -1) nextDirection = dir;
+            }
+        });
+    });
+    
     document.addEventListener('keydown', handleKeydown);
+}
+
+function togglePause() {
+    if (gameLoop) {
+        isPaused = !isPaused;
+        document.getElementById('pauseBtn').textContent = isPaused ? '▶️ 继续' : '⏸️ 暂停';
+    }
 }
 
 // 开始游戏
@@ -64,6 +92,7 @@ function startGame(diff) {
     powerupTimer = 0;
     powerups = [];
     particles = [];
+    isPaused = false;
     
     // 初始化蛇
     snake = [
@@ -78,6 +107,8 @@ function startGame(diff) {
     
     document.getElementById('score').textContent = score;
     document.getElementById('startScreen').classList.add('hidden');
+    document.getElementById('pauseBtn').classList.remove('hidden');
+    document.getElementById('pauseBtn').textContent = '⏸️ 暂停';
     
     if (gameLoop) clearInterval(gameLoop);
     gameLoop = setInterval(update, gameSpeed);
@@ -323,6 +354,9 @@ function updatePowerupStatus() {
 // 游戏结束
 function gameOver() {
     clearInterval(gameLoop);
+    gameLoop = null;
+    isPaused = false;
+    document.getElementById('pauseBtn').classList.add('hidden');
     if (score > highScore) {
         highScore = score;
         saveHighScore();

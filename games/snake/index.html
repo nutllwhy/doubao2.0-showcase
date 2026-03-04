@@ -9,7 +9,11 @@
 <body>
     <div class="container">
         <header>
-            <h1>🐍 贪吃蛇豪华版</h1>
+            <div class="header-top">
+                <a href="../../index.html" class="home-btn">🏠 主页</a>
+                <h1>🐍 贪吃蛇豪华版</h1>
+                <button id="pauseBtn" class="pause-btn hidden">⏸️ 暂停</button>
+            </div>
             <div class="score-board">
                 <span class="score-label">分数：</span>
                 <span id="score" class="score">0</span>
@@ -40,6 +44,7 @@
                 <div class="game-over-buttons">
                     <button id="saveScoreBtn" class="primary-btn">保存分数</button>
                     <button id="restartBtn" class="primary-btn">再来一局</button>
+                    <a href="../../index.html" class="secondary-btn" style="text-decoration: none;">返回主页</a>
                 </div>
             </div>
 
@@ -56,10 +61,16 @@
                 <p>🎮 方向键 / WASD 控制移动</p>
                 <p>⏸️ 空格键 暂停游戏</p>
             </div>
-        </div>
-
-        <div class="back-link">
-            <a href="../../index.html">← 返回主页</a>
+            <div id="touchControls" class="touch-controls">
+                <div class="touch-row">
+                    <button class="touch-btn" data-dir="up">↑</button>
+                </div>
+                <div class="touch-row">
+                    <button class="touch-btn" data-dir="left">←</button>
+                    <button class="touch-btn" data-dir="down">↓</button>
+                    <button class="touch-btn" data-dir="right">→</button>
+                </div>
+            </div>
         </div>
     </div>
 
