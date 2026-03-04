@@ -205,7 +205,7 @@ function updatePreview() {
         <table style="width: 100%; border-collapse: collapse; margin: 0; padding: 0;">
             <tr>
                 <td style="background: ${styles.bg}; padding: 30px 20px;">
-                    <div style="max-width: 680px; margin: 0 auto; color: ${styles.text}; font-size: 16px; line-height: 1.8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                    <div style="max-width: 680px; margin: 0 auto; color: ${styles.text}; font-size: 15px; line-height: 1.8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
                         ${styledHtml}
                     </div>
                 </td>
