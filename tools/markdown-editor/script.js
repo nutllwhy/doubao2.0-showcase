@@ -38,6 +38,38 @@ const templateStyles = {
         codeBg: '#16213e',
         quoteBg: '#0f3460',
         quoteBorder: '#00ff88'
+    },
+    fresh: {
+        bg: '#f0fdf4',
+        text: '#166534',
+        primary: '#22c55e',
+        codeBg: '#dcfce7',
+        quoteBg: '#d1fae5',
+        quoteBorder: '#22c55e'
+    },
+    magazine: {
+        bg: '#fafaf9',
+        text: '#292524',
+        primary: '#ea580c',
+        codeBg: '#f5f5f4',
+        quoteBg: '#fef3c7',
+        quoteBorder: '#ea580c'
+    },
+    academic: {
+        bg: '#f8fafc',
+        text: '#1e293b',
+        primary: '#4f46e5',
+        codeBg: '#f1f5f9',
+        quoteBg: '#e0e7ff',
+        quoteBorder: '#4f46e5'
+    },
+    notebook: {
+        bg: '#fefce8',
+        text: '#713f12',
+        primary: '#eab308',
+        codeBg: '#fef9c3',
+        quoteBg: '#fef08a',
+        quoteBorder: '#eab308'
     }
 };
 
