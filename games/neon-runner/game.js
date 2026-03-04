@@ -1,15 +1,97 @@
 // 霓虹冲刺 - 3D跑酷游戏
 let scene, camera, renderer;
-let player, ground, obstacles = [], coins = [];
+let player, ground, obstacles = [], coins = [], powerups = [];
 let gameSpeed = 0.3;
-let score = 0, distance = 0;
+let score = 0, distance = 0, coinsCollected = 0;
 let isGameOver = false, isAIDemo = false;
 let playerLane = 1;
 let isJumping = false, jumpVelocity = 0;
 let lanes = [-4, 0, 4];
-let lastObstacleZ = 0, lastCoinZ = 0;
+let lastObstacleZ = 0, lastCoinZ = 0, lastPowerupZ = 0;
+let playerLevel = 1;
+let hasShield = false, shieldMesh;
+let hasMagnet = false, magnetTime = 0;
+let audioContext;
+let soundBuffers = {};
+
+function initAudio() {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+}
+
+function playSound(type) {
+    if (!audioContext) return;
+    
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    switch(type) {
+        case 'coin':
+            oscillator.frequency.setValueAtTime(880, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(1760, audioContext.currentTime + 0.1);
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.2);
+            break;
+        case 'jump':
+            oscillator.frequency.setValueAtTime(300, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(600, audioContext.currentTime + 0.15);
+            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.15);
+            break;
+        case 'hit':
+            oscillator.type = 'sawtooth';
+            oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(50, audioContext.currentTime + 0.3);
+            gainNode.gain.setValueAtTime(0.4, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.3);
+            break;
+        case 'powerup':
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(523, audioContext.currentTime);
+            oscillator.frequency.setValueAtTime(659, audioContext.currentTime + 0.1);
+            oscillator.frequency.setValueAtTime(784, audioContext.currentTime + 0.2);
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.4);
+            break;
+        case 'levelup':
+            const osc1 = audioContext.createOscillator();
+            const osc2 = audioContext.createOscillator();
+            const gain1 = audioContext.createGain();
+            
+            osc1.connect(gain1);
+            osc2.connect(gain1);
+            gain1.connect(audioContext.destination);
+            
+            osc1.frequency.setValueAtTime(523, audioContext.currentTime);
+            osc2.frequency.setValueAtTime(659, audioContext.currentTime);
+            osc1.frequency.setValueAtTime(784, audioContext.currentTime + 0.15);
+            osc2.frequency.setValueAtTime(988, audioContext.currentTime + 0.15);
+            osc1.frequency.setValueAtTime(1047, audioContext.currentTime + 0.3);
+            osc2.frequency.setValueAtTime(1319, audioContext.currentTime + 0.3);
+            
+            gain1.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gain1.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            
+            osc1.start(audioContext.currentTime);
+            osc2.start(audioContext.currentTime);
+            osc1.stop(audioContext.currentTime + 0.5);
+            osc2.stop(audioContext.currentTime + 0.5);
+            break;
+    }
+}
 
 function init() {
+    initAudio();
     scene = new THREE.Scene();
     scene.fog = new THREE.Fog(0x0a0a0f, 10, 100);
 
@@ -85,25 +167,89 @@ function createGround() {
 }
 
 function createPlayer() {
-    const bodyGeometry = new THREE.BoxGeometry(1, 1.5, 1);
-    const bodyMaterial = new THREE.MeshPhongMaterial({ 
-        color: 0xff00ff,
-        emissive: 0xff00ff,
-        emissiveIntensity: 0.5
-    });
-    player = new THREE.Mesh(bodyGeometry, bodyMaterial);
+    updatePlayerAppearance();
     player.position.y = 1.25;
     player.position.z = 5;
     scene.add(player);
+}
 
-    const glowGeometry = new THREE.SphereGeometry(1.5, 16, 16);
+function updatePlayerAppearance() {
+    if (player) {
+        scene.remove(player);
+    }
+    
+    let geometry, color, emissiveColor, size;
+    
+    switch(playerLevel) {
+        case 1:
+            geometry = new THREE.BoxGeometry(1, 1.5, 1);
+            color = 0xff00ff;
+            emissiveColor = 0xff00ff;
+            size = 1.5;
+            break;
+        case 2:
+            geometry = new THREE.CapsuleGeometry(0.5, 1, 8, 16);
+            color = 0x00ffff;
+            emissiveColor = 0x00ffff;
+            size = 1.8;
+            break;
+        case 3:
+            geometry = new THREE.DodecahedronGeometry(0.8);
+            color = 0xffff00;
+            emissiveColor = 0xffaa00;
+            size = 2;
+            break;
+        case 4:
+            geometry = new THREE.IcosahedronGeometry(0.8);
+            color = 0x00ff00;
+            emissiveColor = 0x00ff00;
+            size = 2.2;
+            break;
+        default:
+            geometry = new THREE.OctahedronGeometry(0.9);
+            color = 0xff6600;
+            emissiveColor = 0xff3300;
+            size = 2.5;
+    }
+    
+    const bodyMaterial = new THREE.MeshPhongMaterial({ 
+        color: color,
+        emissive: emissiveColor,
+        emissiveIntensity: 0.5 + playerLevel * 0.1
+    });
+    player = new THREE.Mesh(geometry, bodyMaterial);
+    
+    const glowGeometry = new THREE.SphereGeometry(size, 16, 16);
     const glowMaterial = new THREE.MeshBasicMaterial({ 
-        color: 0xff00ff,
+        color: color,
         transparent: true,
         opacity: 0.2
     });
     const glow = new THREE.Mesh(glowGeometry, glowMaterial);
     player.add(glow);
+}
+
+function createShield() {
+    if (shieldMesh) {
+        scene.remove(shieldMesh);
+    }
+    
+    const shieldGeometry = new THREE.SphereGeometry(1.8, 16, 16);
+    const shieldMaterial = new THREE.MeshBasicMaterial({ 
+        color: 0x00ffff,
+        transparent: true,
+        opacity: 0.3,
+        wireframe: true
+    });
+    shieldMesh = new THREE.Mesh(shieldGeometry, shieldMaterial);
+    player.add(shieldMesh);
+}
+
+function removeShield() {
+    if (shieldMesh) {
+        player.remove(shieldMesh);
+        shieldMesh = null;
+    }
 }
 
 function createBackground() {
@@ -149,7 +295,7 @@ function spawnObstacle() {
     const obstacle = new THREE.Mesh(obstacleGeometry, obstacleMaterial);
     obstacle.position.x = lanes[Math.floor(Math.random() * 3)];
     obstacle.position.y = 1;
-    obstacle.position.z = lastObstacleZ - 30;
+    obstacle.position.z = lastObstacleZ - 20 - Math.random() * 15;
     obstacle.userData.type = 'obstacle';
     scene.add(obstacle);
     obstacles.push(obstacle);
@@ -166,11 +312,46 @@ function spawnCoin() {
     const coin = new THREE.Mesh(coinGeometry, coinMaterial);
     coin.position.x = lanes[Math.floor(Math.random() * 3)];
     coin.position.y = 2;
-    coin.position.z = lastCoinZ - 20;
+    coin.position.z = lastCoinZ - 15 - Math.random() * 10;
     coin.userData.type = 'coin';
     scene.add(coin);
     coins.push(coin);
     lastCoinZ = coin.position.z;
+}
+
+function spawnPowerup() {
+    const types = ['shield', 'magnet', 'score'];
+    const type = types[Math.floor(Math.random() * types.length)];
+    
+    let geometry, color;
+    switch(type) {
+        case 'shield':
+            geometry = new THREE.IcosahedronGeometry(0.5);
+            color = 0x00ffff;
+            break;
+        case 'magnet':
+            geometry = new THREE.TorusKnotGeometry(0.4, 0.15, 32, 8);
+            color = 0xff00ff;
+            break;
+        case 'score':
+            geometry = new THREE.OctahedronGeometry(0.5);
+            color = 0xffff00;
+            break;
+    }
+    
+    const material = new THREE.MeshPhongMaterial({ 
+        color: color,
+        emissive: color,
+        emissiveIntensity: 0.8
+    });
+    const powerup = new THREE.Mesh(geometry, material);
+    powerup.position.x = lanes[Math.floor(Math.random() * 3)];
+    powerup.position.y = 2.5;
+    powerup.position.z = lastPowerupZ - 50 - Math.random() * 30;
+    powerup.userData.type = type;
+    scene.add(powerup);
+    powerups.push(powerup);
+    lastPowerupZ = powerup.position.z;
 }
 
 function movePlayer(direction) {
@@ -185,6 +366,7 @@ function jump() {
     if (isGameOver || isJumping) return;
     isJumping = true;
     jumpVelocity = 0.4;
+    playSound('jump');
 }
 
 function handleKeydown(e) {
@@ -206,8 +388,17 @@ function checkCollisions() {
         const obstacleBox = new THREE.Box3().setFromObject(obstacle);
         
         if (playerBox.intersectsBox(obstacleBox)) {
-            gameOver();
-            return;
+            if (hasShield) {
+                hasShield = false;
+                removeShield();
+                scene.remove(obstacle);
+                obstacles.splice(i, 1);
+                playSound('hit');
+            } else {
+                playSound('hit');
+                gameOver();
+                return;
+            }
         }
     }
 
@@ -215,18 +406,80 @@ function checkCollisions() {
         const coin = coins[i];
         const coinBox = new THREE.Box3().setFromObject(coin);
         
+        let collectCoin = false;
         if (playerBox.intersectsBox(coinBox)) {
+            collectCoin = true;
+        } else if (hasMagnet) {
+            const dx = coin.position.x - player.position.x;
+            const dz = coin.position.z - player.position.z;
+            const dist = Math.sqrt(dx * dx + dz * dz);
+            if (dist < 8) {
+                coin.position.x += (player.position.x - coin.position.x) * 0.1;
+                coin.position.z += (player.position.z - coin.position.z) * 0.1;
+                if (dist < 2) {
+                    collectCoin = true;
+                }
+            }
+        }
+        
+        if (collectCoin) {
             score += 100;
+            coinsCollected++;
+            checkLevelUp();
             scene.remove(coin);
             coins.splice(i, 1);
+            playSound('coin');
             updateUI();
         }
+    }
+
+    for (let i = powerups.length - 1; i >= 0; i--) {
+        const powerup = powerups[i];
+        const powerupBox = new THREE.Box3().setFromObject(powerup);
+        
+        if (playerBox.intersectsBox(powerupBox)) {
+            switch(powerup.userData.type) {
+                case 'shield':
+                    hasShield = true;
+                    createShield();
+                    break;
+                case 'magnet':
+                    hasMagnet = true;
+                    magnetTime = 500;
+                    break;
+                case 'score':
+                    score += 500;
+                    break;
+            }
+            scene.remove(powerup);
+            powerups.splice(i, 1);
+            playSound('powerup');
+            updateUI();
+        }
+    }
+}
+
+function checkLevelUp() {
+    const newLevel = Math.floor(coinsCollected / 10) + 1;
+    if (newLevel > playerLevel && newLevel <= 5) {
+        playerLevel = newLevel;
+        const savedX = player.position.x;
+        const savedY = player.position.y;
+        const savedZ = player.position.z;
+        updatePlayerAppearance();
+        player.position.set(savedX, savedY, savedZ);
+        scene.add(player);
+        if (hasShield) {
+            createShield();
+        }
+        playSound('levelup');
     }
 }
 
 function updateUI() {
     document.getElementById('scoreDisplay').textContent = score;
     document.getElementById('distanceDisplay').textContent = Math.floor(distance) + 'm';
+    document.getElementById('levelDisplay').textContent = playerLevel;
 }
 
 function gameOver() {
@@ -238,6 +491,7 @@ function gameOver() {
 function resetGame() {
     score = 0;
     distance = 0;
+    coinsCollected = 0;
     gameSpeed = 0.3;
     playerLane = 1;
     isJumping = false;
@@ -246,6 +500,11 @@ function resetGame() {
     isAIDemo = false;
     lastObstacleZ = 0;
     lastCoinZ = 0;
+    lastPowerupZ = 0;
+    playerLevel = 1;
+    hasShield = false;
+    hasMagnet = false;
+    magnetTime = 0;
 
     for (let i = obstacles.length - 1; i >= 0; i--) {
         scene.remove(obstacles[i]);
@@ -256,6 +515,11 @@ function resetGame() {
         scene.remove(coins[i]);
     }
     coins = [];
+
+    for (let i = powerups.length - 1; i >= 0; i--) {
+        scene.remove(powerups[i]);
+    }
+    powerups = [];
 
     player.position.x = lanes[1];
     player.position.y = 1.25;
@@ -372,11 +636,40 @@ function animate() {
             }
         }
 
-        if (lastObstacleZ > -80) {
+        if (lastObstacleZ > -40) {
             spawnObstacle();
+            if (Math.random() > 0.6) {
+                const extraObstacleGeometry = new THREE.BoxGeometry(1.5, 2, 1.5);
+                const extraObstacleMaterial = new THREE.MeshPhongMaterial({ 
+                    color: 0xff0055,
+                    emissive: 0xff0055,
+                    emissiveIntensity: 0.5
+                });
+                const extraObstacle = new THREE.Mesh(extraObstacleGeometry, extraObstacleMaterial);
+                let extraLane = Math.floor(Math.random() * 3);
+                while (extraLane === lanes.indexOf(obstacles[obstacles.length - 1].position.x) && obstacles.length > 0) {
+                    extraLane = Math.floor(Math.random() * 3);
+                }
+                extraObstacle.position.x = lanes[extraLane];
+                extraObstacle.position.y = 1;
+                extraObstacle.position.z = lastObstacleZ - 15 - Math.random() * 10;
+                extraObstacle.userData.type = 'obstacle';
+                scene.add(extraObstacle);
+                obstacles.push(extraObstacle);
+            }
         }
-        if (lastCoinZ > -60) {
+        if (lastCoinZ > -30) {
             spawnCoin();
+        }
+        if (lastPowerupZ > -100) {
+            spawnPowerup();
+        }
+        
+        if (hasMagnet) {
+            magnetTime--;
+            if (magnetTime <= 0) {
+                hasMagnet = false;
+            }
         }
 
         checkCollisions();
