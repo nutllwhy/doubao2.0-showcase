@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>手势塔罗 - 神秘运势解读</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+            overflow: hidden;
+            color: #e0e0ff;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 100;
+        }
+
+        .home-btn {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9d4edd;
+            text-decoration: none;
+            font-size: 1rem;
+            padding: 10px 20px;
+            border: 2px solid #9d4edd;
+            background: rgba(157, 78, 221, 0.1);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .home-btn:hover {
+            background: rgba(157, 78, 221, 0.3);
+            box-shadow: 0 0 20px rgba(157, 78, 221, 0.5);
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #9d4edd, #c77dff, #9d4edd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(157, 78, 221, 0.5);
+        }
+
+        .subtitle {
+            color: #c77dff;
+            margin-top: 5px;
+            font-size: 1.1rem;
+        }
+
+        .main-content {
+            display: flex;
+            gap: 30px;
+            height: calc(100vh - 150px);
+        }
+
+        .camera-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .camera-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 0 40px rgba(157, 78, 221, 0.4);
+            border: 3px solid #9d4edd;
+        }
+
+        #video {
+            width: 100%;
+            display: block;
+            transform: scaleX(-1);
+        }
+
+        #canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transform: scaleX(-1);
+        }
+
+        .gesture-hint {
+            margin-top: 20px;
+            text-align: center;
+            padding: 20px;
+            background: rgba(157, 78, 221, 0.1);
+            border-radius: 15px;
+            border: 2px solid #9d4edd;
+            max-width: 500px;
+        }
+
+        .gesture-hint h3 {
+            color: #c77dff;
+            margin-bottom: 10px;
+        }
+
+        .gesture-hint p {
+            color: #e0e0ff;
+            line-height: 1.8;
+        }
+
+        .current-gesture {
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            font-size: 1.2rem;
+            color: #00ff88;
+        }
+
+        .tarot-section {
+            flex: 1.5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .spread-type {
+            margin-bottom: 30px;
+            display: flex;
+            gap: 20px;
+        }
+
+        .spread-btn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #9d4edd 0%, #7b2cbf 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Georgia', serif;
+        }
+
+        .spread-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(157, 78, 221, 0.5);
+        }
+
+        .spread-btn.active {
+            box-shadow: 0 0 30px rgba(157, 78, 221, 0.8);
+        }
+
+        .cards-container {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            width: 120px;
+            height: 180px;
+            perspective: 1000px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.8s ease;
+        }
+
+        .card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
+
+        .card-back {
+            background: linear-gradient(135deg, #240046 0%, #3c096c 50%, #5a189a 100%);
+            border: 3px solid #9d4edd;
+            box-shadow: 0 0 30px rgba(157, 78, 221, 0.5);
+        }
+
+        .card-back::before {
+            content: '✧';
+            font-size: 4rem;
+            color: #c77dff;
+            text-shadow: 0 0 20px #c77dff;
+        }
+
+        .card-front {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 3px solid #c77dff;
+            transform: rotateY(180deg);
+            text-align: center;
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .card-name {
+            font-size: 0.9rem;
+            color: #c77dff;
+            font-weight: bold;
+        }
+
+        .card-meaning {
+            font-size: 0.75rem;
+            color: #9d4edd;
+            margin-top: 5px;
+        }
+
+        .reading-section {
+            width: 100%;
+            max-width: 600px;
+            background: rgba(157, 78, 221, 0.1);
+            border: 2px solid #9d4edd;
+            border-radius: 15px;
+            padding: 25px;
+            display: none;
+        }
+
+        .reading-section.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .reading-title {
+            font-size: 1.5rem;
+            color: #c77dff;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .reading-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .reading-tab {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #9d4edd;
+            border-radius: 8px;
+            color: #e0e0ff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .reading-tab:hover, .reading-tab.active {
+            background: rgba(157, 78, 221, 0.3);
+        }
+
+        .reading-content {
+            line-height: 1.8;
+            color: #e0e0ff;
+        }
+
+        .reading-card {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border-left: 4px solid #9d4edd;
+        }
+
+        .reading-card-name {
+            color: #c77dff;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .reading-card-text {
+            color: #e0e0ff;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .action-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Georgia', serif;
+        }
+
+        .action-btn.primary {
+            background: linear-gradient(135deg, #9d4edd 0%, #7b2cbf 100%);
+            color: white;
+        }
+
+        .action-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(157, 78, 221, 0.5);
+        }
+
+        .status-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 12, 41, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .status-overlay.hidden {
+            display: none;
+        }
+
+        .status-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .status-text {
+            font-size: 1.5rem;
+            color: #c77dff;
+            text-align: center;
+        }
+
+        @media (max-width: 1200px) {
+            .main-content {
+                flex-direction: column;
+                height: auto;
+                gap: 20px;
+            }
+
+            .camera-section, .tarot-section {
+                flex: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <a href="../../index.html" class="home-btn">🏠 主页</a>
+            <h1 class="title">🔮 手势塔罗</h1>
+            <p class="subtitle">用你的手势，揭开命运的神秘面纱</p>
+        </header>
+
+        <div class="main-content">
+            <div class="camera-section">
+                <div class="camera-container">
+                    <video id="video" autoplay playsinline></video>
+                    <canvas id="canvas"></canvas>
+                </div>
+                <div class="gesture-hint">
+                    <h3>✋ 手势说明</h3>
+                    <p>
+                        <strong>👆 伸食指</strong> - 选择第1张牌<br>
+                        <strong>✌️ 伸两根手指</strong> - 选择第2张牌<br>
+                        <strong>🤟 伸三根手指</strong> - 选择第3张牌<br>
+                        <strong>🖐️ 张开手掌</strong> - 重新开始
+                    </p>
+                    <div class="current-gesture" id="currentGesture">等待手势...</div>
+                </div>
+            </div>
+
+            <div class="tarot-section">
+                <div class="spread-type">
+                    <button class="spread-btn active" data-spread="one">单张牌</button>
+                    <button class="spread-btn" data-spread="three">三张牌阵</button>
+                </div>
+                <div class="cards-container" id="cardsContainer"></div>
+                <div class="reading-section" id="readingSection">
+                    <h2 class="reading-title">✨ 运势解读</h2>
+                    <div class="reading-tabs">
+                        <button class="reading-tab active" data-type="love">💕 爱情</button>
+                        <button class="reading-tab" data-type="career">💼 事业</button>
+                        <button class="reading-tab" data-type="wealth">💰 财运</button>
+                        <button class="reading-tab" data-type="health">🏥 健康</button>
+                    </div>
+                    <div class="reading-content" id="readingContent"></div>
+                </div>
+                <div class="action-buttons" id="actionButtons" style="display: none;">
+                    <button class="action-btn primary" id="resetBtn">🔄 再来一次</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="status-overlay" id="statusOverlay">
+        <div class="status-icon" id="statusIcon">🔮</div>
+        <div class="status-text" id="statusText">正在加载...</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
