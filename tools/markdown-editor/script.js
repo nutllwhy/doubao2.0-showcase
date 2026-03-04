@@ -190,7 +190,9 @@ function clearEditor() {
 }
 
 function applyTemplate(template) {
+    currentTemplate = template;
     preview.className = 'wechat-preview template-' + template;
+    updatePreview();
 }
 
 function updatePreview() {
