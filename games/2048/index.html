@@ -5,11 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>2048 AI对战版</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/11.1.1/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-c.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-cpp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>🎯 2048 AI对战版</h1>
+            <div class="header-top">
+                <a href="../../index.html" class="home-btn">🏠 主页</a>
+                <h1>🎯 2048 AI对战版</h1>
+            </div>
             <div class="game-modes">
                 <button class="mode-btn active" data-mode="solo">🎮 单人模式</button>
                 <button class="mode-btn" data-mode="ai-vs">⚔️ AI对战</button>
@@ -61,10 +77,16 @@
                 <p>🎮 方向键 / WASD 移动方块</p>
                 <p>🏆 相同数字合并，目标2048！</p>
             </div>
-        </div>
-
-        <div class="back-link">
-            <a href="../../index.html">← 返回主页</a>
+            <div id="touchControls" class="touch-controls">
+                <div class="touch-row">
+                    <button class="touch-btn" data-dir="up">↑</button>
+                </div>
+                <div class="touch-row">
+                    <button class="touch-btn" data-dir="left">←</button>
+                    <button class="touch-btn" data-dir="down">↓</button>
+                    <button class="touch-btn" data-dir="right">→</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -72,7 +94,10 @@
         <div class="modal-content">
             <h2 id="modalTitle">游戏结束！</h2>
             <p id="modalMessage"></p>
-            <button id="modalNewGame" class="primary-btn">再来一局</button>
+            <div class="modal-buttons">
+                <button id="modalNewGame" class="primary-btn">再来一局</button>
+                <a href="../../index.html" class="secondary-btn" style="text-decoration: none;">返回主页</a>
+            </div>
         </div>
     </div>
 

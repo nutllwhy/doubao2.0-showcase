@@ -1,6 +1,6 @@
 // 2048 AI对战版 - 游戏逻辑
 const GRID_SIZE = 4;
-const CELL_SIZE = 110;
+const CELL_SIZE = 100;
 const CELL_GAP = 10;
 
 // 游戏模式
