@@ -374,6 +374,34 @@ function init() {
 
     document.addEventListener('keydown', handleKeydown);
 
+    // 触摸控制
+    document.querySelectorAll('.touch-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (gameMode !== 'solo' && gameMode !== 'ai-vs') return;
+            if (playerGame.gameOver) return;
+            
+            const dir = btn.dataset.dir;
+            const moved = playerGame.move(dir);
+            
+            if (moved && gameMode === 'ai-vs' && !aiGame.gameOver) {
+                setTimeout(() => {
+                    const aiMove = getBestMove(aiGame);
+                    if (aiMove) aiGame.move(aiMove);
+                    
+                    if (playerGame.gameOver) {
+                        if (gameMode === 'ai-vs' && !aiGame.gameOver) {
+                            showGameOver('AI获胜！', `玩家: ${playerGame.score} vs AI: ${aiGame.score}`);
+                        } else {
+                            showGameOver('游戏结束！', `最终分数: ${playerGame.score}`);
+                        }
+                    } else if (gameMode === 'ai-vs' && aiGame.gameOver && !playerGame.gameOver) {
+                        showGameOver('玩家获胜！', `玩家: ${playerGame.score} vs AI: ${aiGame.score}`);
+                    }
+                }, 300);
+            }
+        });
+    });
+
     setGameMode('solo');
 }
 
@@ -460,8 +488,10 @@ function handleKeydown(e) {
         const moved = playerGame.move(keyMap[e.key]);
         
         if (moved && gameMode === 'ai-vs' && !aiGame.gameOver) {
-            const aiMove = getBestMove(aiGame);
-            if (aiMove) aiGame.move(aiMove);
+            setTimeout(() => {
+                const aiMove = getBestMove(aiGame);
+                if (aiMove) aiGame.move(aiMove);
+            }, 300);
         }
 
         if (playerGame.gameOver) {
