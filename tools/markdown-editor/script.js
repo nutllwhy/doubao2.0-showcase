@@ -5,6 +5,42 @@ let editor = null;
 let preview = null;
 let currentTemplate = 'tech';
 
+// 模板样式配置
+const templateStyles = {
+    tech: {
+        bg: '#ffffff',
+        text: '#333333',
+        primary: '#1890ff',
+        codeBg: '#f5f7fa',
+        quoteBg: '#e6f7ff',
+        quoteBorder: '#1890ff'
+    },
+    minimal: {
+        bg: '#ffffff',
+        text: '#333333',
+        primary: '#333333',
+        codeBg: '#f8f8f8',
+        quoteBg: '#f5f5f5',
+        quoteBorder: '#999999'
+    },
+    warm: {
+        bg: '#fffbf5',
+        text: '#4a4a4a',
+        primary: '#ff6b35',
+        codeBg: '#fff5e6',
+        quoteBg: '#fff0e6',
+        quoteBorder: '#ff6b35'
+    },
+    dark: {
+        bg: '#1a1a2e',
+        text: '#eaeaea',
+        primary: '#00ff88',
+        codeBg: '#16213e',
+        quoteBg: '#0f3460',
+        quoteBorder: '#00ff88'
+    }
+};
+
 const insertTemplates = {
     h2: '## 二级标题\n\n',
     h3: '### 三级标题\n\n',
@@ -159,7 +195,55 @@ function applyTemplate(template) {
 
 function updatePreview() {
     const html = marked.parse(editor.value || '');
-    preview.innerHTML = '<div class="wechat-content">' + html + '</div>';
+    const styles = templateStyles[currentTemplate];
+    
+    // 把样式应用到内联样式，确保复制到公众号时能保留
+    const styledHtml = applyInlineStyles(html, styles);
+    preview.innerHTML = '<div class="wechat-content" style="background: ' + styles.bg + '; color: ' + styles.text + ';">' + styledHtml + '</div>';
+}
+
+function applyInlineStyles(html, styles) {
+    let result = html;
+    
+    // h1
+    result = result.replace(/<h1>/g, '<h1 style="font-size: 28px; font-weight: bold; margin: 30px 0 20px 0; padding-bottom: 15px; border-bottom: 3px solid ' + styles.primary + '; color: ' + styles.primary + ';">');
+    
+    // h2
+    result = result.replace(/<h2>/g, '<h2 style="font-size: 22px; font-weight: bold; margin: 25px 0 15px 0; padding-left: 12px; border-left: 4px solid ' + styles.primary + '; color: ' + styles.text + ';">');
+    
+    // h3
+    result = result.replace(/<h3>/g, '<h3 style="font-size: 18px; font-weight: bold; margin: 20px 0 10px 0; color: ' + styles.text + ';">');
+    
+    // p
+    result = result.replace(/<p>/g, '<p style="margin: 15px 0; text-align: justify; color: ' + styles.text + ';">');
+    
+    // strong/b
+    result = result.replace(/<strong>/g, '<strong style="font-weight: bold; color: ' + styles.primary + ';">');
+    result = result.replace(/<b>/g, '<b style="font-weight: bold; color: ' + styles.primary + ';">');
+    
+    // a
+    result = result.replace(/<a /g, '<a style="color: ' + styles.primary + '; text-decoration: underline;" ');
+    
+    // blockquote
+    result = result.replace(/<blockquote>/g, '<blockquote style="margin: 20px 0; padding: 15px 20px; background: ' + styles.quoteBg + '; border-left: 4px solid ' + styles.quoteBorder + '; color: ' + styles.text + '; font-style: italic;">');
+    
+    // code (inline)
+    result = result.replace(/<code>/g, '<code style="background: ' + styles.codeBg + '; padding: 2px 6px; border-radius: 4px; font-family: Monaco, Menlo, monospace; font-size: 14px; color: ' + styles.primary + ';">');
+    
+    // pre/code (code block)
+    result = result.replace(/<pre>/g, '<pre style="margin: 20px 0; padding: 15px 20px; background: ' + styles.codeBg + '; border-radius: 8px; overflow-x: auto;">');
+    result = result.replace(/<pre><code/g, '<pre><code style="background: transparent; padding: 0; color: ' + styles.text + '; font-size: 14px; line-height: 1.6;"');
+    
+    // hr
+    result = result.replace(/<hr>/g, '<hr style="border: none; border-top: 2px solid ' + styles.primary + '; margin: 30px 0; opacity: 0.3;">');
+    
+    // th
+    result = result.replace(/<th>/g, '<th style="border: 1px solid ' + styles.quoteBorder + '; padding: 10px 15px; text-align: left; background: ' + styles.quoteBg + '; font-weight: bold; color: ' + styles.primary + ';">');
+    
+    // td
+    result = result.replace(/<td>/g, '<td style="border: 1px solid ' + styles.quoteBorder + '; padding: 10px 15px; text-align: left; color: ' + styles.text + ';">');
+    
+    return result;
 }
 
 function copyToWechat() {
@@ -169,9 +253,18 @@ function copyToWechat() {
         return;
     }
 
+    // 创建一个临时div，确保只复制带内联样式的内容
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = content.innerHTML;
+    
+    // 添加到body但隐藏
+    tempDiv.style.position = 'absolute';
+    tempDiv.style.left = '-9999px';
+    document.body.appendChild(tempDiv);
+
     const selection = window.getSelection();
     const range = document.createRange();
-    range.selectNodeContents(content);
+    range.selectNodeContents(tempDiv);
     selection.removeAllRanges();
     selection.addRange(range);
 
@@ -183,6 +276,7 @@ function copyToWechat() {
     }
 
     selection.removeAllRanges();
+    document.body.removeChild(tempDiv);
 }
 
 function showCopyStatus() {
