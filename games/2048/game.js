@@ -131,7 +131,7 @@ class Game2048 {
         return { r, c };
     }
 
-    move(direction) {
+    move(direction, skipRender = false) {
         if (this.gameOver) return false;
 
         const oldGrid = JSON.stringify(this.grid);
@@ -187,10 +187,12 @@ class Game2048 {
             this.score += scoreGain;
             this.moves++;
             this.addRandomTile();
-            this.render();
-            this.updateStats();
+            if (!skipRender) {
+                this.render();
+                this.updateStats();
+            }
             this.checkGameOver();
-            if (scoreGain === 0) playSound2048('move');
+            if (scoreGain === 0 && !skipRender) playSound2048('move');
             return true;
         }
         return false;
@@ -275,7 +277,7 @@ class Game2048 {
         const moves = [];
         for (const dir of ['up', 'down', 'left', 'right']) {
             const clone = this.clone();
-            if (clone.move(dir)) {
+            if (clone.move(dir, true)) {
                 moves.push({ direction: dir, game: clone });
             }
         }
