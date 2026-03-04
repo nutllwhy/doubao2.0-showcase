@@ -108,11 +108,51 @@ function bindEvents() {
         scheduleSave();
     });
 
+    editor.addEventListener('keydown', handleShortcuts);
+
     document.getElementById('loadTemplateBtn').addEventListener('click', loadTemplate);
     document.getElementById('clearBtn').addEventListener('click', clearEditor);
     document.getElementById('exportHtmlBtn').addEventListener('click', exportHtml);
     document.getElementById('exportPdfBtn').addEventListener('click', exportPdf);
     document.getElementById('toggleThemeBtn').addEventListener('click', toggleTheme);
+}
+
+function handleShortcuts(e) {
+    if (e.ctrlKey || e.metaKey) {
+        switch (e.key.toLowerCase()) {
+            case 's':
+                e.preventDefault();
+                saveContent();
+                showNotification('已保存！');
+                break;
+            case 'b':
+                e.preventDefault();
+                wrapText('**', '**');
+                break;
+            case 'i':
+                e.preventDefault();
+                wrapText('*', '*');
+                break;
+            case 'k':
+                e.preventDefault();
+                wrapText('[', '](url)');
+                break;
+        }
+    }
+}
+
+function wrapText(prefix, suffix) {
+    const start = editor.selectionStart;
+    const end = editor.selectionEnd;
+    const selectedText = editor.value.substring(start, end);
+    const newText = prefix + (selectedText || '文字') + suffix;
+    
+    editor.value = editor.value.substring(0, start) + newText + editor.value.substring(end);
+    editor.focus();
+    editor.setSelectionRange(start + prefix.length, start + newText.length);
+    
+    updatePreview();
+    scheduleSave();
 }
 
 function updatePreview() {

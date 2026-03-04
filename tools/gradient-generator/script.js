@@ -20,6 +20,8 @@ function init() {
 }
 
 function bindEvents() {
+    document.getElementById('randomBtn').addEventListener('click', generateRandomGradient);
+    
     document.querySelectorAll('.type-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
@@ -213,6 +215,35 @@ function applyPresetBackgrounds() {
         const colors = preset.dataset.colors.split(',');
         preset.style.background = `linear-gradient(135deg, ${colors.join(', ')})`;
     });
+}
+
+function generateRandomGradient() {
+    const randomColors = [];
+    const numColors = Math.floor(Math.random() * 2) + 2;
+    
+    for (let i = 0; i < numColors; i++) {
+        randomColors.push('#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0'));
+    }
+    
+    colorStops = randomColors.map((color, index) => ({
+        color: color,
+        position: index === 0 ? 0 : index === randomColors.length - 1 ? 100 : Math.round((index / (randomColors.length - 1)) * 100)
+    }));
+    
+    const types = ['linear', 'radial'];
+    gradientType = types[Math.floor(Math.random() * types.length)];
+    
+    document.querySelectorAll('.type-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.type === gradientType) {
+            btn.classList.add('active');
+        }
+    });
+    
+    toggleControls();
+    renderColorStops();
+    updatePreview();
+    showNotification('随机渐变已生成！');
 }
 
 function showNotification(message) {
